@@ -17,6 +17,7 @@ def create_canonical_key(name_str):
     only_ascii = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
     cleaned_str = re.sub('[^a-zA-Z ]', '', only_ascii).upper()
     parts = sorted(cleaned_str.split())
+    return "".join(parts)
 
 def build_new_photo_url(uri):
     match = re.search(r'(d\d+)', uri)
