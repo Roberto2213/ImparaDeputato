@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modalità Allenamento</title>
+
+    <!-- Link PWA e Meta Tags per Mobile -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#6366f1">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6c757d;
+            --text-tertiary: #adb5bd;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-light: #e0e7ff;
+            --success: #10b981;
+            --success-bg: #d1fae5;
+            --error: #ef4444;
+            --error-bg: #fee2e2;
+            --border: #e5e7eb;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-tertiary: #64748b;
+            --accent-primary: #818cf8;
+            --accent-hover: #6366f1;
+            --accent-light: #312e81;
+            --success: #34d399;
+            --success-bg: #064e3b;
+            --error: #f87171;
+            --error-bg: #7f1d1d;
+            --border: #334155;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--bg-primary);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            background: var(--accent-light);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin: 30px 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        #group-select, #rounds-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+        }
+
+        #group-select {
+            padding-right: 45px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 24px;
+        }
+
+        #group-select:hover, #rounds-input:hover {
+            border-color: var(--accent-primary);
+        }
+
+        #group-select:focus, #rounds-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 18px 32px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            background-color: transparent;
+            border: 2px solid var(--accent-primary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--accent-light);
+            color: var(--accent-hover);
+        }
+
+        .info-text {
+            margin-top: 20px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        #game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        #game-header > div:first-child {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        #score-text {
+            color: var(--accent-primary);
+            font-size: 1.2rem;
+            margin-top: 4px;
+        }
+
+        #image-container {
+            width: 280px;
+            height: 373px;
+            margin: 0 auto 30px auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            position: relative;
+        }
+
+        #deputy-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #answers-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+        }
+
+        .answer-btn:not(:disabled):hover {
+            background: var(--accent-light);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px var(--shadow);
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .answer-btn .name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+        }
+
+        .answer-btn .group {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .answer-btn.correct {
+            background: var(--success-bg);
+            border-color: var(--success);
+        }
+
+        .answer-btn.incorrect {
+            background: var(--error-bg);
+            border-color: var(--error);
+        }
+
+        #feedback-text {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 16px;
+            border-radius: 12px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #feedback-text.correct {
+            color: var(--success);
+            background: var(--success-bg);
+        }
+
+        #feedback-text.incorrect {
+            color: var(--error);
+            background: var(--error-bg);
+        }
+
+        #end-screen h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        #final-score-text {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin: 30px 0 40px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            #answers-container {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                top: 15px;
+                right: 15px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container > div:not(.hidden) {
+            animation: fadeIn 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+            🌙
+        </button>
+
+        <!-- 1. Schermata di Configurazione -->
+        <div id="setup-screen">
+            <h1>Allenamento Deputati</h1>
+            <div class="form-group">
+                <label for="group-select">Scegli un Gruppo Parlamentare</label>
+                <div class="custom-select">
+                    <select id="group-select"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="rounds-input">Numero di Deputati da Indovinare</label>
+                <input type="number" id="rounds-input" value="10" min="1" max="100">
+            </div>
+            <button class="btn-primary" id="start-btn">Inizia Allenamento</button>
+            <p id="deputy-count-info" class="info-text"></p>
+        </div>
+
+        <!-- 2. Schermata di Gioco -->
+        <div id="game-screen" class="hidden">
+            <div id="game-header">
+                <div>
+                    <div id="progress-text">Domanda 1 / 10</div>
+                    <div id="score-text">Punteggio: 0</div>
+                </div>
+                <button id="quit-btn" class="btn-secondary">Esci</button>
+            </div>
+            <div id="image-container">
+                <img id="deputy-image" src="" alt="Foto del deputato">
+            </div>
+            <div id="answers-container">
+                <!-- I pulsanti di risposta verranno generati da JS -->
+            </div>
+            <div id="feedback-text"></div>
+        </div>
+
+        <!-- 3. Schermata Finale -->
+        <div id="end-screen" class="hidden">
+            <h1>Sessione Terminata!</h1>
+            <p id="final-score-text">Punteggio Finale: 8 / 10</p>
+            <button class="btn-primary" id="restart-btn">Allenati Ancora</button>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        const savedTheme = localStorage.getItem('theme');
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const currentTheme = savedTheme || systemTheme;
+        
+        html.setAttribute('data-theme', currentTheme);
+        themeToggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+        
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+        });
+
+        // Game Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            // Screen elements
+            const setupScreen = document.getElementById('setup-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const endScreen = document.getElementById('end-screen');
+
+            // Setup elements
+            const groupSelect = document.getElementById('group-select');
+            const roundsInput = document.getElementById('rounds-input');
+            const startBtn = document.getElementById('start-btn');
+            const deputyCountInfo = document.getElementById('deputy-count-info');
+
+            // Game elements
+            const progressText = document.getElementById('progress-text');
+            const scoreText = document.getElementById('score-text');
+            const deputyImage = document.getElementById('deputy-image');
+            const answersContainer = document.getElementById('answers-container');
+            const feedbackText = document.getElementById('feedback-text');
+            const quitBtn = document.getElementById('quit-btn');
+
+            // End screen elements
+            const finalScoreText = document.getElementById('final-score-text');
+            const restartBtn = document.getElementById('restart-btn');
+
+            // Game state variables
+            let allDeputies = [];
+            let sessionDeputies = [];
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let totalRounds = 10;
+            let correctDeputy = null;
+            let nextQuestionTimeout = null;
+
+            async function initialize() {
+                const [deputiesRes, groupsRes] = await Promise.all([
+                    fetch('/api/deputies'),
+                    fetch('/api/groups')
+                ]);
+                allDeputies = await deputiesRes.json();
+                const groups = await groupsRes.json();
+
+                groupSelect.innerHTML = groups.map(g => `<option value="${g}">${g}</option>`).join('');
+                
+                updateDeputyCount();
+                groupSelect.addEventListener('change', updateDeputyCount);
+            }
+
+            function updateDeputyCount() {
+                const selectedGroup = groupSelect.value;
+                const availableCount = (selectedGroup === 'Tutti')
+                    ? allDeputies.length
+                    : allDeputies.filter(d => d.simple_group === selectedGroup).length;
+                
+                deputyCountInfo.textContent = `${availableCount} deputati disponibili in questo gruppo`;
+            }
+
+            function startTraining() {
+                const selectedGroup = groupSelect.value;
+                totalRounds = parseInt(roundsInput.value, 10);
+
+                const availableDeputies = (selectedGroup === 'Tutti')
+                    ? [...allDeputies]
+                    : allDeputies.filter(d => d.simple_group === selectedGroup);
+
+                if (availableDeputies.length < 4) {
+                    alert("Questo gruppo non ha abbastanza deputati (minimo 4) per iniziare l'allenamento.");
+                    return;
+                }
+
+                shuffleArray(availableDeputies);
+                sessionDeputies = availableDeputies.slice(0, Math.min(totalRounds, availableDeputies.length));
+                totalRounds = sessionDeputies.length;
+
+                currentQuestionIndex = 0;
+                score = 0;
+                
+                setupScreen.classList.add('hidden');
+                endScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+
+                displayNextQuestion();
+            }
+
+            function displayNextQuestion() {
+                if (currentQuestionIndex >= totalRounds) {
+                    endSession();
+                    return;
+                }
+
+                updateGameHeader();
+                feedbackText.textContent = '';
+                feedbackText.className = '';
+                
+                correctDeputy = sessionDeputies[currentQuestionIndex];
+                deputyImage.src = correctDeputy.photo_url;
+                
+                const wrongOptionsPool = allDeputies.filter(d => d.name !== correctDeputy.name && d.simple_group === correctDeputy.simple_group);
+                shuffleArray(wrongOptionsPool);
+                const wrongOptions = wrongOptionsPool.slice(0, 3);
+
+                const options = [correctDeputy, ...wrongOptions];
+                shuffleArray(options);
+
+                answersContainer.innerHTML = '';
+                options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.className = 'answer-btn';
+                    button.innerHTML = `<span class="name">${option.name}</span><span class="group">${option.group}</span>`;
+                    button.onclick = () => handleAnswer(option.name === correctDeputy.name, button);
+                    answersContainer.appendChild(button);
+                });
+            }
+
+            function handleAnswer(isCorrect, clickedButton) {
+                document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
+
+                if (isCorrect) {
+                    score++;
+                    clickedButton.classList.add('correct');
+                    feedbackText.textContent = '✓ Corretto!';
+                    feedbackText.className = 'correct';
+                } else {
+                    clickedButton.classList.add('incorrect');
+                    feedbackText.textContent = `✗ Sbagliato! La risposta era ${correctDeputy.name}`;
+                    feedbackText.className = 'incorrect';
+                    document.querySelectorAll('.answer-btn').forEach(btn => {
+                        if (btn.querySelector('.name').textContent === correctDeputy.name) {
+                            btn.classList.add('correct');
+                        }
+                    });
+                }
+                updateGameHeader();
+                
+                currentQuestionIndex++;
+                nextQuestionTimeout = setTimeout(displayNextQuestion, 2000);
+            }
+            
+            function endSession() {
+                gameScreen.classList.add('hidden');
+                endScreen.classList.remove('hidden');
+                finalScoreText.textContent = `${score} / ${totalRounds}`;
+            }
+
+            function restartTraining() {
+                endScreen.classList.add('hidden');
+                setupScreen.classList.remove('hidden');
+            }
+
+            function quitGame() {
+                if (nextQuestionTimeout) {
+                    clearTimeout(nextQuestionTimeout);
+                }
+                gameScreen.classList.add('hidden');
+                setupScreen.classList.remove('hidden');
+            }
+            
+            function updateGameHeader() {
+                progressText.textContent = `Domanda ${currentQuestionIndex + 1} / ${totalRounds}`;
+                scoreText.textContent = `Punteggio: ${score}`;
+            }
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            // Event Listeners
+            startBtn.addEventListener('click', startTraining);
+            restartBtn.addEventListener('click', restartTraining);
+            quitBtn.addEventListener('click', quitGame);
+
+            initialize();
+            
+            // PWA Service Worker Registration
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/service-worker.js')
+                        .then(registration => {
+                            console.log('Service Worker registrato con successo:', registration);
+                        })
+                        .catch(error => {
+                            console.log('Registrazione del Service Worker fallita:', error);
+                        });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
