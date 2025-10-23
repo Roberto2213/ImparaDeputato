@@ -376,6 +376,31 @@
         .container > div:not(.hidden) {
             animation: fadeIn 0.4s ease;
         }
+        
+        .site-footer {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .site-footer p {
+            margin: 0 0 8px 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .site-footer a {
+            color: var(--accent-primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .site-footer a:hover {
+            text-decoration: underline;
+            color: var(--accent-hover);
+        }
     </style>
 </head>
 <body>
@@ -425,6 +450,13 @@
             <p id="final-score-text">Punteggio Finale: 8 / 10</p>
             <button class="btn-primary" id="restart-btn">Allenati Ancora</button>
         </div>
+ <footer class="site-footer">
+            <p>
+                Made with ❤️ by <a href="https://github.com/Roberto2213" target="_blank" rel="noopener noreferrer">Roberto Bastevole</a>.
+            </p>
+            <p>Rilasciato sotto licenza MIT.</p>
+        </footer>
+
     </div>
 
     <script>
