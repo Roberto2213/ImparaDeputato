@@ -1,0 +1,2083 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emiciclo Parlamentare (v2 con Highlight)</title>
+
+    <!-- 1. Link ai tuoi file CSS locali -->
+    <link href="dove_siedono.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="posizioni.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="gruppi.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="componenti.css" media="all" rel="stylesheet" type="text/css" />
+
+    <!-- 2. Stile personalizzato per l'app -->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            /* Rimuove il padding superiore quando è in un iframe */
+            padding-top: 0 !important;
+        }
+
+        /* Nasconde l'header (inutile dentro un iframe) */
+        #app-header { display: none; }
+        
+        /* Nasconde la legenda (inutile dentro un iframe) */
+        #legenda { display: none; }
+
+        #dove_siedono { min-height: 800px; margin-top: 0; }
+
+        /* Stile per l'hover (preso dai tuoi file) */
+        #emiciclo a:hover {
+            -webkit-transform: scale(3.5);
+            -moz-transform: scale(3.5);
+            transform: scale(3.5);
+            z-index: 9999;
+            border: 1px solid #FF0000 !important;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        /* --- NUOVO STILE PER EVIDENZIARE --- */
+        #emiciclo a.highlighted {
+            -webkit-transform: scale(4.0);
+            transform: scale(4.0);
+            z-index: 10000;
+            border: 3px solid #FFD700 !important; /* Bordo oro acceso */
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+            
+            /* Animazione per farlo pulsare */
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(3.5); box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+            50% { transform: scale(4.2); box-shadow: 0 0 20px rgba(255, 215, 0, 1); }
+            100% { transform: scale(3.5); box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="dove_siedono">
+        <div id="emiciclo">
+<a class="true circle" href="Javascript:void(0);" id="seggio_1" title="1">
+							1
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_2" title="2">
+							2
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_3" title="3">
+							3
+						</a>
+<a class="AVS circle" href="Javascript:void(0);" id="seggio_4" title="4 - ZARATTI FILIBERTO AVS">
+							4
+						</a>
+<a class="AVS circle" href="Javascript:void(0);" id="seggio_5" title="5 - MARI FRANCESCO AVS">
+							5
+						</a>
+<a class="AVS circle" href="Javascript:void(0);" id="seggio_6" title="6 - ZANELLA LUANA AVS">
+							6
+						</a>
+<a class="AVS circle" href="Javascript:void(0);" id="seggio_7" title="7 - DORI DEVIS AVS">
+							7
+						</a>
+<a class="AVS circle" href="Javascript:void(0);" id="seggio_8" title="8 - FRATOIANNI NICOLA AVS">
+							8
+						</a>
+<a class="AVS circle" href="Javascript:void(0);" id="seggio_9" title="9 - GRIMALDI MARCO AVS">
+							9
+						</a>
+<a class="AVS circle" href="Javascript:void(0);" id="seggio_10" title="10 - BORRELLI FRANCESCO EMILIO AVS">
+							10
+						</a>
+<a class="AVS circle" href="Javascript:void(0);" id="seggio_11" title="11 - GHIRRA FRANCESCA AVS">
+							11
+						</a>
+<a class="AVS circle" href="Javascript:void(0);" id="seggio_12" title="12 - PICCOLOTTI ELISABETTA AVS">
+							12
+						</a>
+<a class="AVS circle" href="Javascript:void(0);" id="seggio_13" title="13 - BONELLI ANGELO AVS">
+							13
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_14" title="14">
+							14
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_15" title="15 - GRIBAUDO CHIARA PD-IDP">
+							15
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_16" title="16 - TABACCI BRUNO PD-IDP">
+							16
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_17" title="17 - BAKKALI OUIDAD PD-IDP">
+							17
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_18" title="18 - AMENDOLA VINCENZO PD-IDP">
+							18
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_19" title="19 - DE MICHELI PAOLA PD-IDP">
+							19
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_20" title="20 - BERRUTO MAURO PD-IDP">
+							20
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_21" title="21 - CARE' NICOLA PD-IDP">
+							21
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_22" title="22 - CURTI AUGUSTO PD-IDP">
+							22
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_23" title="23 - MORASSUT ROBERTO PD-IDP">
+							23
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_24" title="24 - CUPERLO GIANNI PD-IDP">
+							24
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_25" title="25 - FILIPPIN ROSANNA PD-IDP">
+							25
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_26" title="26 - DI BIASE MICHELA PD-IDP">
+							26
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_27" title="27 - D'ALFONSO LUCIANO PD-IDP">
+							27
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_28" title="28 - ORFINI MATTEO PD-IDP">
+							28
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_29" title="29 - BARBAGALLO ANTHONY EMANUELE PD-IDP">
+							29
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_30" title="30 - SCOTTO ARTURO PD-IDP">
+							30
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_31" title="31 - GUERRA MARIA CECILIA PD-IDP">
+							31
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_32" title="32 - SPERANZA ROBERTO PD-IDP">
+							32
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_33" title="33 - STUMPO NICOLA PD-IDP">
+							33
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_34" title="34 - DI SANZO CHRISTIAN DIEGO PD-IDP">
+							34
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_35" title="35 - EVI ELEONORA PD-IDP">
+							35
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_36" title="36 - PANDOLFO ALBERTO PD-IDP">
+							36
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_37" title="37">
+							37
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_38" title="38 - FASSINO PIERO PD-IDP">
+							38
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_39" title="39 - FOSSI EMILIANO PD-IDP">
+							39
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_40" title="40">
+							40
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_41" title="41 - FURFARO MARCO PD-IDP">
+							41
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_42" title="42">
+							42
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_43" title="43 - GNASSI ANDREA PD-IDP">
+							43
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_44" title="44">
+							44
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_45" title="45">
+							45
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_46" title="46">
+							46
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_47" title="47">
+							47
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_48" title="48">
+							48
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_49" title="49">
+							49
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_50" title="50">
+							50
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_51" title="51">
+							51
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_52" title="52">
+							52
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_53" title="53">
+							53
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_54" title="54">
+							54
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_55" title="55 - BOLDRINI LAURA PD-IDP">
+							55
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_56" title="56 - QUARTAPELLE PROCOPIO LIA PD-IDP">
+							56
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_57" title="57 - GUERINI LORENZO PD-IDP">
+							57
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_58" title="58 - MADIA MARIA ANNA PD-IDP">
+							58
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_59" title="59 - SARRACINO MARCO PD-IDP">
+							59
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_60" title="60 - SCARPA RACHELE PD-IDP">
+							60
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_61" title="61 - PAGANO UBALDO PD-IDP">
+							61
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_62" title="62 - FORNARO FEDERICO PD-IDP">
+							62
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_63" title="63 - CASU ANDREA PD-IDP">
+							63
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_64" title="64 - ROGGIANI SILVIA PD-IDP">
+							64
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_65" title="65 - ASCANI ANNA PD-IDP">
+							65
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_66" title="66 - DE MARIA ANDREA PD-IDP">
+							66
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_67" title="67 - BRAGA CHIARA PD-IDP">
+							67
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_68" title="68 - SCHLEIN ELLY PD-IDP">
+							68
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_69" title="69 - BONAFE' SIMONA PD-IDP">
+							69
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_70" title="70 - RICCIARDI TONI PD-IDP">
+							70
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_71" title="71 - CIANI PAOLO PD-IDP">
+							71
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_72" title="72 - GHIO VALENTINA PD-IDP">
+							72
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_73" title="73 - FERRARI SARA PD-IDP">
+							73
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_74" title="74 - DE LUCA PIERO PD-IDP">
+							74
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_75" title="75 - SIMIANI MARCO PD-IDP">
+							75
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_76" title="76 - MANCINI CLAUDIO PD-IDP">
+							76
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_77" title="77 - MAURI MATTEO PD-IDP">
+							77
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_78" title="78 - SERRACCHIANI DEBORA PD-IDP">
+							78
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_79" title="79 - FORATTINI ANTONELLA PD-IDP">
+							79
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_80" title="80 - PELUFFO VINICIO GIUSEPPE GUIDO PD-IDP">
+							80
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_81" title="81 - PORTA FABIO PD-IDP">
+							81
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_82" title="82 - GIRELLI GIAN ANTONIO PD-IDP">
+							82
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_83" title="83 - ROSSI ANDREA PD-IDP">
+							83
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_84" title="84 - PROVENZANO GIUSEPPE PD-IDP">
+							84
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_85" title="85 - MALAVASI ILENIA PD-IDP">
+							85
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_86" title="86 - LAUS MAURO ANTONIO DONATO PD-IDP">
+							86
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_87" title="87 - VACCARI STEFANO PD-IDP">
+							87
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_88" title="88 - MANZI IRENE PD-IDP">
+							88
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_89" title="89 - MARINO MARIA STEFANIA PD-IDP">
+							89
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_90" title="90 - MEROLA VIRGINIO PD-IDP">
+							90
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_91" title="91 - GRAZIANO STEFANO PD-IDP">
+							91
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_92" title="92 - ROMEO NADIA PD-IDP">
+							92
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_93" title="93 - STEFANAZZI CLAUDIO MICHELE PD-IDP">
+							93
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_94" title="94 - GIANASSI FEDERICO PD-IDP">
+							94
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_95" title="95 - IACONO GIOVANNA PD-IDP">
+							95
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_96" title="96 - PRESTIPINO PATRIZIA PD-IDP">
+							96
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_97" title="97 - LAI SILVIO PD-IDP">
+							97
+						</a>
+<a class="PD-IDP circle" href="Javascript:void(0);" id="seggio_98" title="98 - LACARRA MARCO PD-IDP">
+							98
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_99" title="99">
+							99
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_100" title="100">
+							100
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_101" title="101">
+							101
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_102" title="102">
+							102
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_103" title="103">
+							103
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_104" title="104">
+							104
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_105" title="105">
+							105
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_106" title="106">
+							106
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_107" title="107">
+							107
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_108" title="108">
+							108
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_109" title="109">
+							109
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_110" title="110">
+							110
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_111" title="111">
+							111
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_112" title="112">
+							112
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_113" title="113">
+							113
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_114" title="114">
+							114
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_115" title="115">
+							115
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_116" title="116">
+							116
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_117" title="117">
+							117
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_118" title="118">
+							118
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_119" title="119 - SCERRA FILIPPO M5S">
+							119
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_120" title="120 - Postazione disabilitata">
+							120
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_121" title="121 - RAFFA ANGELA M5S">
+							121
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_122" title="122 - LOMUTI ARNALDO M5S">
+							122
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_123" title="123 - PERANTONI MARIO M5S">
+							123
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_124" title="124 - Postazione disabilitata">
+							124
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_125" title="125 - FEDE GIORGIO M5S">
+							125
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_126" title="126 - DELL'OLIO GIANMAURO M5S">
+							126
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_127" title="127 - CARMINA IDA M5S">
+							127
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_128" title="128 - DONNO LEONARDO M5S">
+							128
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_129" title="129 - TORTO DANIELA M5S">
+							129
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_130" title="130 - BALDINO VITTORIA M5S">
+							130
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_131" title="131 - L'ABBATE PATTY M5S">
+							131
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_132" title="132 - PENZA PASQUALINO M5S">
+							132
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_133" title="133 - COLUCCI ALFONSO M5S">
+							133
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_134" title="134 - ALIFANO ENRICA M5S">
+							134
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_135" title="135 - QUARTINI ANDREA M5S">
+							135
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_136" title="136 - MORFINO DANIELA M5S">
+							136
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_137" title="137 - SANTILLO AGOSTINO M5S">
+							137
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_138" title="138 - FONTANA ILARIA M5S">
+							138
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_139" title="139 - AURIEMMA CARMELA M5S">
+							139
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_140" title="140 - CONTE GIUSEPPE M5S">
+							140
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_141" title="141 - RICCIARDI RICCARDO M5S">
+							141
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_142" title="142 - CANTONE LUCIANO M5S">
+							142
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_143" title="143 - IARIA ANTONINO M5S">
+							143
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_144" title="144 - FERRARA ANTONIO M5S">
+							144
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_145" title="145 - APPENDINO CHIARA M5S">
+							145
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_146" title="146 - PAVANELLI EMMA M5S">
+							146
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_147" title="147 - SILVESTRI FRANCESCO M5S">
+							147
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_148" title="148 - D'ORSO VALENTINA M5S">
+							148
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_149" title="149 - TRAVERSI ROBERTO M5S">
+							149
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_150" title="150 - GUBITOSA MICHELE M5S">
+							150
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_151" title="151 - Postazione disabilitata">
+							151
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_152" title="152 - GIULIANO CARLA M5S">
+							152
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_153" title="153 - CAFIERO DE RAHO FEDERICO M5S">
+							153
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_154" title="154 - ASCARI STEFANIA M5S">
+							154
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_155" title="155 - AMATO GAETANO M5S">
+							155
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_156" title="156 - ORRICO ANNA LAURA M5S">
+							156
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_157" title="157 - CASO ANTONIO M5S">
+							157
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_158" title="158 - PELLEGRINI MARCO M5S">
+							158
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_159" title="159 - Postazione disabilitata">
+							159
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_160" title="160 - DI LAURO CARMEN M5S">
+							160
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_161" title="161 - RICCIARDI MARIANNA M5S">
+							161
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_162" title="162 - SPORTIELLO GILDA M5S">
+							162
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_163" title="163 - CHERCHI SUSANNA M5S">
+							163
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_164" title="164 - BARZOTTI VALENTINA M5S">
+							164
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_165" title="165 - AIELLO DAVIDE M5S">
+							165
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_166" title="166 - TUCCI RICCARDO M5S">
+							166
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_167" title="167 - CAROTENUTO DARIO M5S">
+							167
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_168" title="168 - CARAMIELLO ALESSANDRO M5S">
+							168
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_169" title="169 - COSTA SERGIO M5S">
+							169
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_170" title="170 - BRUNO RAFFAELE M5S">
+							170
+						</a>
+<a class="M5S circle" href="Javascript:void(0);" id="seggio_171" title="171 - CAPPELLETTI ENRICO M5S">
+							171
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_172" title="172">
+							172
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_173" title="173">
+							173
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_174" title="174">
+							174
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_175" title="175">
+							175
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_176" title="176">
+							176
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_177" title="177">
+							177
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_178" title="178">
+							178
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_179" title="179">
+							179
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_180" title="180">
+							180
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_181" title="181">
+							181
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_182" title="182">
+							182
+						</a>
+<a class="APERRE circle" href="Javascript:void(0);" id="seggio_183" title="183 - GRIPPO VALENTINA APERRE">
+							183
+						</a>
+<a class="APERRE circle" href="Javascript:void(0);" id="seggio_184" title="184 - D'ALESSIO ANTONIO APERRE">
+							184
+						</a>
+<a class="APERRE circle" href="Javascript:void(0);" id="seggio_185" title="185 - BENZONI FABRIZIO APERRE">
+							185
+						</a>
+<a class="APERRE circle" href="Javascript:void(0);" id="seggio_186" title="186 - ROSATO ETTORE APERRE">
+							186
+						</a>
+<a class="APERRE circle" href="Javascript:void(0);" id="seggio_187" title="187 - SOTTANELLI GIULIO CESARE APERRE">
+							187
+						</a>
+<a class="APERRE circle" href="Javascript:void(0);" id="seggio_188" title="188 - BONETTI ELENA APERRE">
+							188
+						</a>
+<a class="APERRE circle" href="Javascript:void(0);" id="seggio_189" title="189 - RICHETTI MATTEO APERRE">
+							189
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_190" title="190 - Postazione disabilitata">
+							190
+						</a>
+<a class="APERRE circle" href="Javascript:void(0);" id="seggio_191" title="191 - RUFFINO DANIELA APERRE">
+							191
+						</a>
+<a class="APERRE circle" href="Javascript:void(0);" id="seggio_192" title="192 - PASTORELLA GIULIA APERRE">
+							192
+						</a>
+<a class="APERRE circle" href="Javascript:void(0);" id="seggio_193" title="193 - ONORI FEDERICA APERRE">
+							193
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_194" title="194 - Postazione disabilitata">
+							194
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_195" title="195 - Postazione disabilitata">
+							195
+						</a>
+<a class="IVICRE circle" href="Javascript:void(0);" id="seggio_196" title="196 - BOSCHI MARIA ELENA IVICRE">
+							196
+						</a>
+<a class="IVICRE circle" href="Javascript:void(0);" id="seggio_197" title="197 - GIACHETTI ROBERTO IVICRE">
+							197
+						</a>
+<a class="IVICRE circle" href="Javascript:void(0);" id="seggio_198" title="198 - DEL BARBA MAURO IVICRE">
+							198
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_199" title="199 - Postazione disabilitata">
+							199
+						</a>
+<a class="M-ALT circle" href="Javascript:void(0);" id="seggio_200" title="200 - GALLO FRANCESCO M-ALT">
+							200
+						</a>
+<a class="M-ALT circle" href="Javascript:void(0);" id="seggio_201" title="201 - MARATTIN LUIGI M-ALT">
+							201
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_202" title="202 - Postazione disabilitata">
+							202
+						</a>
+<a class="IVICRE circle" href="Javascript:void(0);" id="seggio_203" title="203 - BONIFAZI FRANCESCO IVICRE">
+							203
+						</a>
+<a class="IVICRE circle" href="Javascript:void(0);" id="seggio_204" title="204 - GADDA MARIA CHIARA IVICRE">
+							204
+						</a>
+<a class="IVICRE circle" href="Javascript:void(0);" id="seggio_205" title="205 - FARAONE DAVIDE IVICRE">
+							205
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_206" title="206 - Postazione disabilitata">
+							206
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_207" title="207 - Postazione disabilitata">
+							207
+						</a>
+<a class="M-ALT circle" href="Javascript:void(0);" id="seggio_208" title="208 - SOUMAHORO ABOUBAKAR M-ALT">
+							208
+						</a>
+<a class="M-EUR circle" href="Javascript:void(0);" id="seggio_209" title="209 - DELLA VEDOVA BENEDETTO M-+EUR">
+							209
+						</a>
+<a class="M-EUR circle" href="Javascript:void(0);" id="seggio_210" title="210 - MAGI RICCARDO M-+EUR">
+							210
+						</a>
+<a class="M-EUR circle" href="Javascript:void(0);" id="seggio_211" title="211 - PASTORINO LUCA M-+EUR">
+							211
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_212" title="212 - Postazione disabilitata">
+							212
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_213" title="213">
+							213
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_214" title="214">
+							214
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_215" title="215">
+							215
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_216" title="216">
+							216
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_217" title="217">
+							217
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_218" title="218">
+							218
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_219" title="219">
+							219
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_220" title="220">
+							220
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_221" title="221">
+							221
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_222" title="222">
+							222
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_223" title="223">
+							223
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_224" title="224">
+							224
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_225" title="225">
+							225
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_226" title="226">
+							226
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_227" title="227">
+							227
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_228" title="228">
+							228
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_229" title="229">
+							229
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_230" title="230">
+							230
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_231" title="231">
+							231
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_232" title="232">
+							232
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_233" title="233">
+							233
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_234" title="234">
+							234
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_235" title="235">
+							235
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_236" title="236">
+							236
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_237" title="237">
+							237
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_238" title="238">
+							238
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_239" title="239">
+							239
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_240" title="240">
+							240
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_241" title="241">
+							241
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_242" title="242">
+							242
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_243" title="243">
+							243
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_244" title="244">
+							244
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_245" title="245">
+							245
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_246" title="246">
+							246
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_247" title="247 - ROSSELLO CRISTINA FI-PPE">
+							247
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_248" title="248 - CAPPELLACCI UGO FI-PPE">
+							248
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_249" title="249 - BICCHIELLI PINO FI-PPE">
+							249
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_250" title="250 - PATRIARCA ANNARITA FI-PPE">
+							250
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_251" title="251 - MANGIALAVORI GIUSEPPE TOMMASO VINCENZO FI-PPE">
+							251
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_252" title="252 - RUBANO FRANCESCO MARIA FI-PPE">
+							252
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_253" title="253 - BATTISTONI FRANCESCO FI-PPE">
+							253
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_254" title="254 - PAGANO NAZARIO FI-PPE">
+							254
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_255" title="255 - CATTANEO ALESSANDRO FI-PPE">
+							255
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_256" title="256 - MULE' GIORGIO FI-PPE">
+							256
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_257" title="257 - SALA FABRIZIO FI-PPE">
+							257
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_258" title="258 - BERGAMINI DEBORAH FI-PPE">
+							258
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_259" title="259 - RUSSO PAOLO EMILIO FI-PPE">
+							259
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_260" title="260 - D'ATTIS MAURO FI-PPE">
+							260
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_261" title="261 - NEVI RAFFAELE FI-PPE">
+							261
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_262" title="262 - BARELLI PAOLO FI-PPE">
+							262
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_263" title="263 - BATTILOCCHIO ALESSANDRO FI-PPE">
+							263
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_264" title="264 - PELLA ROBERTO FI-PPE">
+							264
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_265" title="265 - PITTALIS PIETRO FI-PPE">
+							265
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_266" title="266 - MAZZETTI ERICA FI-PPE">
+							266
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_267" title="267 - TENERINI CHIARA FI-PPE">
+							267
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_268" title="268 - BENIGNI STEFANO FI-PPE">
+							268
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_269" title="269 - SORTE ALESSANDRO FI-PPE">
+							269
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_270" title="270 - DALLA CHIESA RITA FI-PPE">
+							270
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_271" title="271 - MARROCCO PATRIZIA FI-PPE">
+							271
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_272" title="272 - TASSINARI ROSARIA FI-PPE">
+							272
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_273" title="273 - FERRANTE TULLIO FI-PPE">
+							273
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_274" title="274 - FASCINA MARTA ANTONIA FI-PPE">
+							274
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_275" title="275 - ORSINI ANDREA FI-PPE">
+							275
+						</a>
+<a class="M-MIN circle" href="Javascript:void(0);" id="seggio_276" title="276 - STEGER DIETER M-MIN">
+							276
+						</a>
+<a class="M-MIN circle" href="Javascript:void(0);" id="seggio_277" title="277 - MANES FRANCO M-MIN">
+							277
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_278" title="278 - LOVECCHIO GIORGIO FI-PPE">
+							278
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_279" title="279 - ARRUZZOLO GIOVANNI FI-PPE">
+							279
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_280" title="280 - GATTA GIANDIEGO FI-PPE">
+							280
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_281" title="281 - CANNIZZARO FRANCESCO FI-PPE">
+							281
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_282" title="282 - CAROPPO ANDREA FI-PPE">
+							282
+						</a>
+<a class="M-MIN circle" href="Javascript:void(0);" id="seggio_283" title="283 - SCHULLIAN MANFRED M-MIN">
+							283
+						</a>
+<a class="M-MIN circle" href="Javascript:void(0);" id="seggio_284" title="284 - GEBHARD RENATE M-MIN">
+							284
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_285" title="285 - TAJANI ANTONIO FI-PPE">
+							285
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_286" title="286 - BELLOMO DAVIDE FI-PPE">
+							286
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_287" title="287 - DE MONTE ISABELLA FI-PPE">
+							287
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_288" title="288 - CASTIGLIONE GIUSEPPE FI-PPE">
+							288
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_289" title="289 - DE PALMA VITO FI-PPE">
+							289
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_290" title="290 - POLIDORI CATIA FI-PPE">
+							290
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_291" title="291">
+							291
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_292" title="292">
+							292
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_293" title="293">
+							293
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_294" title="294">
+							294
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_295" title="295">
+							295
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_296" title="296">
+							296
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_297" title="297">
+							297
+						</a>
+<a class="M-ALT circle" href="Javascript:void(0);" id="seggio_298" title="298 - MESSINA MANLIO M-ALT">
+							298
+						</a>
+<a class="M-ALT circle" href="Javascript:void(0);" id="seggio_299" title="299 - POZZOLO EMANUELE M-ALT">
+							299
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_300" title="300">
+							300
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_301" title="301">
+							301
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_302" title="302">
+							302
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_303" title="303">
+							303
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_304" title="304">
+							304
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_305" title="305">
+							305
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_306" title="306">
+							306
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_307" title="307">
+							307
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_308" title="308">
+							308
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_309" title="309">
+							309
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_310" title="310">
+							310
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_311" title="311 - CARRA' ANASTASIO LEGA">
+							311
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_312" title="312 - Postazione disabilitata">
+							312
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_313" title="313 - ZOFFILI EUGENIO LEGA">
+							313
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_314" title="314 - BOF GIANANGELO LEGA">
+							314
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_315" title="315 - FRENI FEDERICO LEGA">
+							315
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_316" title="316 - MONTEMAGNI ELISA LEGA">
+							316
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_317" title="317 - PIZZIMENTI GRAZIANO LEGA">
+							317
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_318" title="318 - BENVENUTO ALESSANDRO MANUEL LEGA">
+							318
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_319" title="319 - Postazione disabilitata">
+							319
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_320" title="320 - PIERRO ATTILIO LEGA">
+							320
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_321" title="321 - BERGAMINI DAVIDE LEGA">
+							321
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_322" title="322 - CARLONI MIRCO LEGA">
+							322
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_323" title="323 - ZINZI GIANPIERO LEGA">
+							323
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_324" title="324 - MORRONE JACOPO LEGA">
+							324
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_325" title="325 - MATONE SIMONETTA LEGA">
+							325
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_326" title="326 - BISA INGRID LEGA">
+							326
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_327" title="327 - ZIELLO EDOARDO LEGA">
+							327
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_328" title="328 - BITONCI MASSIMO LEGA">
+							328
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_329" title="329 - ANDREUZZA GIORGIA LEGA">
+							329
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_330" title="330 - BARABOTTI ANDREA LEGA">
+							330
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_331" title="331 - DI MATTINA SALVATORE MARCELLO LEGA">
+							331
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_332" title="332 - GUSMEROLI ALBERTO LUIGI LEGA">
+							332
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_333" title="333 - TOCCALINI LUCA LEGA">
+							333
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_334" title="334 - SQUERI LUCA FI-PPE">
+							334
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_335" title="335 - CASASCO MAURIZIO FI-PPE">
+							335
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_336" title="336 - SIRACUSANO MATILDE FI-PPE">
+							336
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_337" title="337 - PICHETTO FRATIN GILBERTO FI-PPE">
+							337
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_338" title="338 - SUDANO VALERIA LEGA">
+							338
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_339" title="339 - RAVETTO LAURA LEGA">
+							339
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_340" title="340 - BAGNASCO ROBERTO FI-PPE">
+							340
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_341" title="341 - Postazione disabilitata">
+							341
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_342" title="342 - Postazione disabilitata">
+							342
+						</a>
+<a class="NM-M-C circle" href="Javascript:void(0);" id="seggio_343" title="343 - CAVO ILARIA NM-M-C">
+							343
+						</a>
+<a class="NM-M-C circle" href="Javascript:void(0);" id="seggio_344" title="344 - COLUCCI ALESSANDRO NM-M-C">
+							344
+						</a>
+<a class="NM-M-C circle" href="Javascript:void(0);" id="seggio_345" title="345 - SEMENZATO MARTINA NM-M-C">
+							345
+						</a>
+<a class="NM-M-C circle" href="Javascript:void(0);" id="seggio_346" title="346 - LUPI MAURIZIO NM-M-C">
+							346
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_347" title="347 - BOSCAINI MARIA PAOLA FI-PPE">
+							347
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_348" title="348 - CALDERONE TOMMASO ANTONINO FI-PPE">
+							348
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_349" title="349 - COSTA ENRICO FI-PPE">
+							349
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_350" title="350 - GENTILE ANDREA FI-PPE">
+							350
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_351" title="351 - Postazione disabilitata">
+							351
+						</a>
+<a class="NM-M-C circle" href="Javascript:void(0);" id="seggio_352" title="352 - TIRELLI FRANCO NM-M-C">
+							352
+						</a>
+<a class="NM-M-C circle" href="Javascript:void(0);" id="seggio_353" title="353 - PISANO CALOGERO NM-M-C">
+							353
+						</a>
+<a class="NM-M-C circle" href="Javascript:void(0);" id="seggio_354" title="354 - ROMANO FRANCESCO SAVERIO NM-M-C">
+							354
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_355" title="355 - MINARDO ANTONINO FI-PPE">
+							355
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_356" title="356 - SACCANI JOTTI GLORIA FI-PPE">
+							356
+						</a>
+<a class="M-ALT circle" href="Javascript:void(0);" id="seggio_357" title="357 - CESA LORENZO M-ALT">
+							357
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_358" title="358">
+							358
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_359" title="359">
+							359
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_360" title="360">
+							360
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_361" title="361">
+							361
+						</a>
+<a class="NM-M-C circle" href="Javascript:void(0);" id="seggio_362" title="362 - CARFAGNA MARIA ROSARIA NM-M-C">
+							362
+						</a>
+<a class="NM-M-C circle" href="Javascript:void(0);" id="seggio_363" title="363 - BRAMBILLA MICHELA VITTORIA NM-M-C">
+							363
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_364" title="364">
+							364
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_365" title="365">
+							365
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_366" title="366">
+							366
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_367" title="367">
+							367
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_368" title="368">
+							368
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_369" title="369">
+							369
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_370" title="370">
+							370
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_371" title="371">
+							371
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_372" title="372">
+							372
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_373" title="373">
+							373
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_374" title="374">
+							374
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_375" title="375 - CRIPPA ANDREA LEGA">
+							375
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_376" title="376 - BILLI SIMONE LEGA">
+							376
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_377" title="377 - FORMENTINI PAOLO LEGA">
+							377
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_378" title="378 - CANDIANI STEFANO LEGA">
+							378
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_379" title="379 - CECCHETTI FABRIZIO LEGA">
+							379
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_380" title="380 - GIGLIO VIGNA ALESSANDRO LEGA">
+							380
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_381" title="381 - GIORGETTI GIANCARLO LEGA">
+							381
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_382" title="382 - LATINI GIORGIA LEGA">
+							382
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_383" title="383 - MIELE GIOVANNA LEGA">
+							383
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_384" title="384 - RIXI EDOARDO LEGA">
+							384
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_385" title="385 - LOIZZO SIMONA LEGA">
+							385
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_386" title="386 - SASSO ROSSANO LEGA">
+							386
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_387" title="387 - CAPARVI VIRGINIO LEGA">
+							387
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_388" title="388 - GAVA VANNIA LEGA">
+							388
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_389" title="389 - GIAGONI DARIO LEGA">
+							389
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_390" title="390 - NISINI TIZIANA LEGA">
+							390
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_391" title="391 - GIACCONE ANDREA LEGA">
+							391
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_392" title="392 - MOLINARI RICCARDO LEGA">
+							392
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_393" title="393 - IEZZI IGOR LEGA">
+							393
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_394" title="394 - BRUZZONE FRANCESCO LEGA">
+							394
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_395" title="395 - BAGNAI ALBERTO LEGA">
+							395
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_396" title="396 - COIN DIMITRI LEGA">
+							396
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_397" title="397 - FURGIUELE DOMENICO LEGA">
+							397
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_398" title="398 - BORDONALI SIMONA LEGA">
+							398
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_399" title="399 - STEFANI ALBERTO LEGA">
+							399
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_400" title="400 - OTTAVIANI NICOLA LEGA">
+							400
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_401" title="401 - CATTOI VANESSA LEGA">
+							401
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_402" title="402 - FRASSINI REBECCA LEGA">
+							402
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_403" title="403 - COMAROLI SILVANA ANDREINA LEGA">
+							403
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_404" title="404 - MACCANTI ELENA LEGA">
+							404
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_405" title="405 - DARA ANDREA LEGA">
+							405
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_406" title="406 - MOLTENI NICOLA LEGA">
+							406
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_407" title="407">
+							407
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_408" title="408 - PRETTO ERIK UMBERTO LEGA">
+							408
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_409" title="409 - Postazione disabilitata">
+							409
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_410" title="410 - MARCHETTI RICCARDO AUGUSTO LEGA">
+							410
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_411" title="411 - CAVANDOLI LAURA LEGA">
+							411
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_412" title="412 - CENTEMERO GIULIO LEGA">
+							412
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_413" title="413 - DE BERTOLDI ANDREA LEGA">
+							413
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_414" title="414 - Postazione disabilitata">
+							414
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_415" title="415 - ANGELUCCI ANTONIO LEGA">
+							415
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_416" title="416">
+							416
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_417" title="417 - PANIZZUT MASSIMILIANO LEGA">
+							417
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_418" title="418 - LAZZARINI ARIANNA LEGA">
+							418
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_419" title="419">
+							419
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_420" title="420">
+							420
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_421" title="421">
+							421
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_422" title="422">
+							422
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_423" title="423">
+							423
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_424" title="424">
+							424
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_425" title="425">
+							425
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_426" title="426">
+							426
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_427" title="427">
+							427
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_428" title="428">
+							428
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_429" title="429">
+							429
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_430" title="430">
+							430
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_431" title="431">
+							431
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_432" title="432">
+							432
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_433" title="433">
+							433
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_434" title="434">
+							434
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_435" title="435">
+							435
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_436" title="436">
+							436
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_437" title="437">
+							437
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_438" title="438">
+							438
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_439" title="439 - IAIA DARIO FDI">
+							439
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_440" title="440 - PIETRELLA FABIO FDI">
+							440
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_441" title="441 - MILANI MASSIMO FDI">
+							441
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_442" title="442 - MOLLICONE FEDERICO FDI">
+							442
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_443" title="443 - PERISSA MARCO FDI">
+							443
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_444" title="444 - ROSCANI FABIO FDI">
+							444
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_445" title="445 - VOLPI ANDREA FDI">
+							445
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_446" title="446 - CANGIANO GEROLAMO FDI">
+							446
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_447" title="447 - LOPERFIDO EMANUELE FDI">
+							447
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_448" title="448 - PADOVANI MARCO FDI">
+							448
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_449" title="449 - MAIORANO GIOVANNI FDI">
+							449
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_450" title="450 - MARCHETTO ALIPRANDI MARINA FDI">
+							450
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_451" title="451 - CIANCITTO FRANCESCO MARIA SALVATORE FDI">
+							451
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_452" title="452 - ROSSO MATTEO FDI">
+							452
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_453" title="453 - MORGANTE MADDALENA FDI">
+							453
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_454" title="454 - MACCARI CARLO FDI">
+							454
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_455" title="455 - GIORDANO ANTONIO FDI">
+							455
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_456" title="456 - LONGI ELIANA FDI">
+							456
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_457" title="457 - AMICH ENZO FDI">
+							457
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_458" title="458 - DEIDDA SALVATORE FDI">
+							458
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_459" title="459 - LEO MAURIZIO FDI">
+							459
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_460" title="460 - DI GIUSEPPE ANDREA FDI">
+							460
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_461" title="461 - LANCELLOTTA ELISABETTA CHRISTIANA FDI">
+							461
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_462" title="462 - BALDELLI ANTONIO FDI">
+							462
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_463" title="463 - FRIJIA MARIA GRAZIA FDI">
+							463
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_464" title="464 - BENVENUTI GOSTOLI STEFANO MARIA FDI">
+							464
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_465" title="465 - POLO BARBARA FDI">
+							465
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_466" title="466 - LAMPIS GIANNI FDI">
+							466
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_467" title="467 - MURA FRANCESCO FDI">
+							467
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_468" title="468 - LA PORTA CHIARA FDI">
+							468
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_469" title="469 - ALMICI CRISTINA FDI">
+							469
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_470" title="470 - MALAGUTI MAURO FDI">
+							470
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_471" title="471">
+							471
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_472" title="472 - PELLICINI ANDREA FDI">
+							472
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_473" title="473 - MALAGOLA LORENZO FDI">
+							473
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_474" title="474 - DI MAGGIO GRAZIA FDI">
+							474
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_475" title="475 - SCHIANO DI VISCONTI MICHELE FDI">
+							475
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_476" title="476 - GIOVINE SILVIO FDI">
+							476
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_477" title="477">
+							477
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_478" title="478 - AMBROSI ALESSIA FDI">
+							478
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_479" title="479 - ROCCELLA EUGENIA FDI">
+							479
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_480" title="480">
+							480
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_481" title="481 - MAZZI GIANMARCO FDI">
+							481
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_482" title="482 - COPPO MARCELLO FDI">
+							482
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_483" title="483">
+							483
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_484" title="484">
+							484
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_485" title="485">
+							485
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_486" title="486">
+							486
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_487" title="487">
+							487
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_488" title="488">
+							488
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_489" title="489">
+							489
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_490" title="490">
+							490
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_491" title="491">
+							491
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_492" title="492">
+							492
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_493" title="493">
+							493
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_494" title="494">
+							494
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_495" title="495">
+							495
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_496" title="496">
+							496
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_497" title="497">
+							497
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_498" title="498">
+							498
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_499" title="499">
+							499
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_500" title="500">
+							500
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_501" title="501">
+							501
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_502" title="502">
+							502
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_503" title="503 - CONGEDO SAVERIO FDI">
+							503
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_504" title="504 - GIORGIANNI CARMEN LETIZIA FDI">
+							504
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_505" title="505 - CANNATA GIOVANNI LUCA FDI">
+							505
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_506" title="506 - KELANY SARA FDI">
+							506
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_507" title="507 - FILINI FRANCESCO FDI">
+							507
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_508" title="508 - COLOSIMO CHIARA FDI">
+							508
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_509" title="509 - ANTONIOZZI ALFREDO FDI">
+							509
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_510" title="510 - DONDI DANIELA FDI">
+							510
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_511" title="511 - BUONGUERRIERI ALICE FDI">
+							511
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_512" title="512 - RUSSO GAETANA FDI">
+							512
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_513" title="513 - CERRETO MARCO FDI">
+							513
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_514" title="514 - URZI' ALESSANDRO FDI">
+							514
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_515" title="515 - GABELLONE ANTONIO MARIA FDI">
+							515
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_516" title="516 - TESTA GUERINO FDI">
+							516
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_517" title="517 - MATERA MARIANGELA FDI">
+							517
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_518" title="518 - MATTEONI NICOLE FDI">
+							518
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_519" title="519 - VINCI GIANLUCA FDI">
+							519
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_520" title="520 - RUSPANDINI MASSIMO FDI">
+							520
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_521" title="521 - PULCIANI PAOLO FDI">
+							521
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_522" title="522 - CALOVINI GIANGIACOMO FDI">
+							522
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_523" title="523 - RAIMONDO CARMINE FABIO FDI">
+							523
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_524" title="524 - CHIESA PAOLA MARIA FDI">
+							524
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_525" title="525 - VIETRI IMMA FDI">
+							525
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_526" title="526 - MAERNA NOVO UMBERTO FDI">
+							526
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_527" title="527 - MASCARETTI ANDREA FDI">
+							527
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_528" title="528 - MICHELOTTI FRANCESCO FDI">
+							528
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_529" title="529 - ROSSI FABRIZIO FDI">
+							529
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_530" title="530 - LA SALANDRA GIANDONATO FDI">
+							530
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_531" title="531 - AMORESE ALESSANDRO FDI">
+							531
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_532" title="532 - MAULLU STEFANO GIOVANNI FDI">
+							532
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_533" title="533 - TREMAGLIA ANDREA FDI">
+							533
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_534" title="534 - COMBA FABRIZIO FDI">
+							534
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_535" title="535">
+							535
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_536" title="536 - ZURZOLO IMMACOLATA FDI">
+							536
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_537" title="537 - COLOMBO BEATRIZ FDI">
+							537
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_538" title="538 - MATTIA ALDO FDI">
+							538
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_539" title="539 - GARDINI ELISABETTA FDI">
+							539
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_540" title="540 - NORDIO CARLO FDI">
+							540
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_541" title="541">
+							541
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_542" title="542 - BELLUCCI MARIA TERESA FDI">
+							542
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_543" title="543 - FERRO WANDA FDI">
+							543
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_544" title="544">
+							544
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_545" title="545 - PRISCO EMANUELE FDI">
+							545
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_546" title="546 - CIRIELLI EDMONDO FDI">
+							546
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_547" title="547">
+							547
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_548" title="548">
+							548
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_549" title="549">
+							549
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_550" title="550">
+							550
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_551" title="551">
+							551
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_552" title="552">
+							552
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_553" title="553">
+							553
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_554" title="554">
+							554
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_555" title="555">
+							555
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_556" title="556">
+							556
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_557" title="557">
+							557
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_558" title="558">
+							558
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_559" title="559">
+							559
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_560" title="560">
+							560
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_561" title="561">
+							561
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_562" title="562">
+							562
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_563" title="563">
+							563
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_564" title="564">
+							564
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_565" title="565">
+							565
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_566" title="566">
+							566
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_567" title="567">
+							567
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_568" title="568 - TRANCASSINI PAOLO FDI">
+							568
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_569" title="569 - DE CORATO RICCARDO FDI">
+							569
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_570" title="570 - ROTONDI GIANFRANCO FDI">
+							570
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_571" title="571 - CIOCCHETTI LUCIANO FDI">
+							571
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_572" title="572 - CAIATA SALVATORE FDI">
+							572
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_573" title="573 - CARETTA MARIA CRISTINA FDI">
+							573
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_574" title="574 - CIABURRO MONICA FDI">
+							574
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_575" title="575 - GRUPPIONI NAIKE FDI">
+							575
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_576" title="576 - LUCASELLI YLENJA FDI">
+							576
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_577" title="577 - RIZZETTO WALTER FDI">
+							577
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_578" title="578 - MASCHIO CIRO FDI">
+							578
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_579" title="579 - TREMONTI GIULIO FDI">
+							579
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_580" title="580 - VARCHI MARIA CAROLINA FDI">
+							580
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_581" title="581 - ROTELLI MAURO FDI">
+							581
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_582" title="582 - OSNATO MARCO FDI">
+							582
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_583" title="583 - MELONI GIORGIA FDI">
+							583
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_584" title="584 - RAMPELLI FABIO FDI">
+							584
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_585" title="585 - Postazione disabilitata">
+							585
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_586" title="586 - SCHIFONE MARTA FDI">
+							586
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_587" title="587 - CARAMANNA GIANLUCA FDI">
+							587
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_588" title="588 - DONZELLI GIOVANNI FDI">
+							588
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_589" title="589 - BIGNAMI GALEAZZO FDI">
+							589
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_590" title="590 - MONTARULI AUGUSTA FDI">
+							590
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_591" title="591 - PALOMBI ALESSANDRO FDI">
+							591
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_592" title="592 - ROSSI ANGELO FDI">
+							592
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_593" title="593 - ZUCCONI RICCARDO FDI">
+							593
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_594" title="594 - LOLLOBRIGIDA FRANCESCO FDI">
+							594
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_595" title="595 - MANTOVANI LUCREZIA MARIA BENEDETTA FDI">
+							595
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_596" title="596 - SILVESTRI RACHELE FDI">
+							596
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_597" title="597 - SBARDELLA LUCA FDI">
+							597
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_598" title="598 - DELMASTRO DELLE VEDOVE ANDREA FDI">
+							598
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_599" title="599">
+							599
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_600" title="600 - GEMMATO MARCELLO FDI">
+							600
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_601" title="601">
+							601
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_602" title="602 - FOTI TOMMASO FDI">
+							602
+						</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_603" title="603 - Postazione disabilitata">
+							603
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_604" title="604">
+							604
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_605" title="605 - FRASSINETTI PAOLA FDI">
+							605
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_606" title="606">
+							606
+						</a>
+<a class="FDI circle" href="Javascript:void(0);" id="seggio_607" title="607 - ALBANO LUCIA FDI">
+							607
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_608" title="608">
+							608
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_609" title="609">
+							609
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_610" title="610">
+							610
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_611" title="611">
+							611
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_612" title="612">
+							612
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_613" title="613">
+							613
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_614" title="614">
+							614
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_615" title="615">
+							615
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_616" title="616">
+							616
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_617" title="617">
+							617
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_618" title="618">
+							618
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_619" title="619">
+							619
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_620" title="620">
+							620
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_621" title="621">
+							621
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_622" title="622">
+							622
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_623" title="623">
+							623
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_624" title="624">
+							624
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_625" title="625">
+							625
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_626" title="626">
+							626
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_627" title="627">
+							627
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_628" title="628">
+							628
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_629" title="629">
+							629
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_630" title="630">
+							630
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_631" title="631">
+							631
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_632" title="632">
+							632
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_633" title="633">
+							633
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_634" title="634">
+							634
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_635" title="635">
+							635
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_636" title="636">
+							636
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_637" title="637">
+							637
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_638" title="638">
+							638
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_639" title="639">
+							639
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_640" title="640">
+							640
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_641" title="641">
+							641
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_642" title="642">
+							642
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_643" title="643">
+							643
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_644" title="644">
+							644
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_645" title="645">
+							645
+						</a>
+<a class="LEGA circle" href="Javascript:void(0);" id="seggio_646" title="646 - BOSSI UMBERTO LEGA">
+							646
+						</a>
+<a class="FI-PPE circle" href="Javascript:void(0);" id="seggio_647" title="647 - CORTELAZZO PIERGIORGIO FI-PPE">
+							647
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_648" title="648">
+							648
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_649" title="649">
+							649
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_650" title="650">
+							650
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_651" title="651">
+							651
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_652" title="652">
+							652
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_653" title="653">
+							653
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_654" title="654">
+							654
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_655" title="655">
+							655
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_656" title="656">
+							656
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_657" title="657">
+							657
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_658" title="658">
+							658
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_659" title="659">
+							659
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_660" title="660">
+							660
+						</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_661" title="661">
+							661
+						</a>
+        </div> <!-- Chiusura #emiciclo -->
+    </div> <!-- Chiusura #dove_siedono -->
+
+    <!-- 
+      --- NUOVO SCRIPT PER LEGGERE L'URL ---
+      Questo script cerca un parametro "?highlight=NUMERO" nell'URL
+      e applica la classe '.highlighted' al seggio corrispondente.
+    -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const seggioId = params.get('highlight');
+
+                if (seggioId) {
+                    const seggio = document.getElementById('seggio_' + seggioId);
+                    if (seggio) {
+                        seggio.classList.add('highlighted');
+                        
+                        // Centra la visuale sul seggio evidenziato
+                        seggio.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center',
+                            inline: 'center'
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Errore nello script di evidenziazione:', e);
+            }
+        });
+    </script>
+</body>
+</html>

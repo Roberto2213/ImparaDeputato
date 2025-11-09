@@ -1,0 +1,21 @@
+#emiciclo .M-ALT, #componenti .M-ALT{
+	background-color:#7C7C7C!important;
+	background-position:top left;
+	color:#FFF!important;
+	background-image:url(../img/m7.gif);
+	background-repeat:repeat;
+}
+#emiciclo .M-EUR, #componenti .M-EUR{
+	background-color:#FF0000!important;
+	background-position:top left;
+	color:#FFF!important;
+	background-image:url(../img/m7.gif);
+	background-repeat:repeat;
+}
+#emiciclo .M-MIN, #componenti .M-MIN{
+	background-color:#339966!important;
+	background-position:top left;
+	color:#FFF!important;
+	background-image:url(../img/m7.gif);
+	background-repeat:repeat;
+}

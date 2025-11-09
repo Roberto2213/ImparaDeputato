@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emiciclo Quiz</title>
+    <link href="dove_siedono.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="posizioni.css" media="all" rel="stylesheet" type="text/css" />
+    <style>
+        :root {
+            --bg-quiz: #f0f2f5;
+            --seat-color: #d1d5db; /* Grigio base */
+            --seat-border: #9ca3af;
+            --seat-hover: #9ca3af;
+            --seat-correct: #10b981; /* Verde successo */
+            --seat-incorrect: #ef4444; /* Rosso errore */
+            --seat-truth: #6366f1; /* Viola (per mostrare la verità) */
+        }
+        [data-theme="dark"] {
+            --bg-quiz: #0f172a;
+            --seat-color: #334155; /* Grigio scuro */
+            --seat-border: #475569;
+            --seat-hover: #475569;
+            --seat-correct: #34d399;
+            --seat-incorrect: #f87171;
+            --seat-truth: #818cf8;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-quiz);
+            margin: 0;
+            padding: 0;
+            padding-top: 0 !important;
+            transition: background-color 0.3s ease;
+        }
+        #dove_siedono { min-height: 800px; margin-top: 0; }
+        #app-header, #legenda { display: none; } /* Nasconde header e legenda */
+
+        /* --- STILI CHIAVE DEL QUIZ --- */
+
+        /* 1. Stile base per tutti i seggi (neutro) */
+        #emiciclo a[id^="seggio_"] {
+            background: var(--seat-color) !important;
+            border: 1px solid var(--seat-border) !important;
+            color: transparent !important; /* Nasconde il numero del seggio */
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        /* 2. Stile per i seggi vuoti (leggermente diverso) */
+        #emiciclo a.true {
+             background: transparent !important;
+             border: 1px dashed var(--seat-border) !important;
+             pointer-events: none; /* Non cliccabili */
+             cursor: not-allowed;
+        }
+
+        /* 3. Hover (solo su seggi cliccabili) */
+        #emiciclo a[id^="seggio_"]:not(.true):hover {
+            -webkit-transform: scale(3.5);
+            transform: scale(3.5);
+            z-index: 9999;
+            background: var(--seat-hover) !important;
+            border: 2px solid var(--seat-hover) !important;
+        }
+        
+        /* 4. Disabilita tutti gli eventi dopo un click */
+        #emiciclo.disabled a {
+            pointer-events: none !important;
+            cursor: default !important;
+        }
+
+        /* --- STILI FEEDBACK --- */
+        
+        /* La risposta CORRETTA data dall'utente */
+        #emiciclo a.correct-guess {
+            background: var(--seat-correct) !important;
+            border-color: #fff !important;
+            transform: scale(4) !important;
+            z-index: 10000;
+        }
+        
+        /* La risposta SBAGLIATA data dall'utente */
+        #emiciclo a.incorrect-guess {
+            background: var(--seat-incorrect) !important;
+            border-color: #fff !important;
+            transform: scale(4) !important;
+            z-index: 10000;
+        }
+        
+        /* La VERA risposta (se l'utente ha sbagliato) */
+        #emiciclo a.truth {
+            background: var(--seat-truth) !important;
+            border-color: #fff !important;
+            transform: scale(4) !important;
+            z-index: 10000;
+        }
+    </style>
+</head>
+<body>
+    <div id="dove_siedono">
+        <div id="emiciclo">
+<a class="true circle" href="Javascript:void(0);" id="seggio_1">1</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_2">2</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_3">3</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_4">4</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_5">5</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_6">6</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_7">7</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_8">8</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_9">9</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_10">10</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_11">11</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_12">12</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_13">13</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_14">14</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_15">15</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_16">16</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_17">17</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_18">18</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_19">19</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_20">20</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_21">21</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_22">22</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_23">23</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_24">24</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_25">25</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_26">26</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_27">27</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_28">28</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_29">29</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_30">30</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_31">31</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_32">32</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_33">33</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_34">34</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_35">35</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_36">36</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_37">37</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_38">38</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_39">39</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_40">40</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_41">41</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_42">42</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_43">43</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_44">44</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_45">45</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_46">46</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_47">47</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_48">48</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_49">49</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_50">50</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_51">51</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_52">52</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_53">53</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_54">54</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_55">55</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_56">56</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_57">57</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_58">58</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_59">59</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_60">60</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_61">61</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_62">62</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_63">63</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_64">64</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_65">65</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_66">66</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_67">67</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_68">68</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_69">69</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_70">70</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_71">71</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_72">72</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_73">73</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_74">74</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_75">75</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_76">76</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_77">77</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_78">78</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_79">79</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_80">80</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_81">81</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_82">82</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_83">83</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_84">84</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_85">85</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_86">86</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_87">87</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_88">88</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_89">89</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_90">90</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_91">91</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_92">92</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_93">93</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_94">94</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_95">95</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_96">96</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_97">97</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_98">98</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_99">99</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_100">100</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_101">101</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_102">102</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_103">103</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_104">104</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_105">105</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_106">106</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_107">107</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_108">108</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_109">109</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_110">110</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_111">111</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_112">112</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_113">113</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_114">114</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_115">115</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_116">116</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_117">117</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_118">118</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_119">119</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_120">120</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_121">121</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_122">122</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_123">123</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_124">124</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_125">125</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_126">126</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_127">127</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_128">128</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_129">129</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_130">130</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_131">131</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_132">132</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_133">133</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_134">134</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_135">135</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_136">136</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_137">137</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_138">138</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_139">139</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_140">140</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_141">141</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_142">142</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_143">143</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_144">144</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_145">145</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_146">146</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_147">147</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_148">148</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_149">149</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_150">150</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_151">151</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_152">152</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_153">153</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_154">154</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_155">155</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_156">156</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_157">157</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_158">158</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_159">159</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_160">160</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_161">161</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_162">162</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_163">163</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_164">164</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_165">165</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_166">166</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_167">167</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_168">168</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_169">169</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_170">170</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_171">171</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_172">172</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_173">173</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_174">174</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_175">175</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_176">176</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_177">177</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_178">178</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_179">179</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_180">180</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_181">181</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_182">182</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_183">183</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_184">184</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_185">185</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_186">186</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_187">187</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_188">188</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_189">189</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_190">190</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_191">191</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_192">192</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_193">193</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_194">194</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_195">195</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_196">196</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_197">197</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_198">198</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_199">199</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_200">200</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_201">201</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_202">202</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_203">203</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_204">204</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_205">205</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_206">206</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_207">207</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_208">208</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_209">209</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_210">210</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_211">211</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_212">212</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_213">213</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_214">214</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_215">215</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_216">216</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_217">217</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_218">218</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_219">219</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_220">220</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_221">221</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_222">222</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_223">223</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_224">224</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_225">225</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_226">226</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_227">227</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_228">228</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_229">229</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_230">230</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_231">231</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_232">232</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_233">233</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_234">234</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_235">235</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_236">236</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_237">237</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_238">238</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_239">239</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_240">240</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_241">241</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_242">242</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_243">243</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_244">244</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_245">245</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_246">246</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_247">247</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_248">248</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_249">249</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_250">250</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_251">251</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_252">252</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_253">253</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_254">254</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_255">255</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_256">256</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_257">257</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_258">258</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_259">259</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_260">260</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_261">261</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_262">262</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_263">263</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_264">264</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_265">265</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_266">266</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_267">267</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_268">268</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_269">269</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_270">270</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_271">271</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_272">272</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_273">273</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_274">274</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_275">275</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_276">276</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_277">277</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_278">278</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_279">279</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_280">280</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_281">281</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_282">282</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_283">283</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_284">284</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_285">285</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_286">286</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_287">287</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_288">288</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_289">289</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_290">290</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_291">291</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_292">292</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_293">293</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_294">294</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_295">295</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_296">296</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_297">297</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_298">298</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_299">299</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_300">300</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_301">301</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_302">302</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_303">303</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_304">304</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_305">305</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_306">306</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_307">307</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_308">308</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_309">309</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_310">310</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_311">311</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_312">312</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_313">313</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_314">314</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_315">315</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_316">316</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_317">317</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_318">318</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_319">319</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_320">320</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_321">321</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_322">322</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_323">323</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_324">324</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_325">325</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_326">326</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_327">327</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_328">328</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_329">329</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_330">330</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_331">331</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_332">332</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_333">333</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_334">334</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_335">335</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_336">336</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_337">337</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_338">338</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_339">339</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_340">340</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_341">341</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_342">342</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_343">343</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_344">344</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_345">345</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_346">346</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_347">347</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_348">348</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_349">349</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_350">350</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_351">351</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_352">352</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_353">353</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_354">354</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_355">355</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_356">356</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_357">357</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_358">358</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_359">359</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_360">360</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_361">361</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_362">362</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_363">363</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_364">364</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_365">365</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_366">366</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_367">367</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_368">368</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_369">369</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_370">370</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_371">371</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_372">372</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_373">373</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_374">374</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_375">375</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_376">376</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_377">377</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_378">378</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_379">379</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_380">380</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_381">381</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_382">382</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_383">383</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_384">384</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_385">385</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_386">386</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_387">387</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_388">388</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_389">389</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_390">390</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_391">391</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_392">392</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_393">393</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_394">394</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_395">395</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_396">396</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_397">397</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_398">398</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_399">399</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_400">400</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_401">401</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_402">402</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_403">403</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_404">404</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_405">405</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_406">406</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_407">407</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_408">408</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_409">409</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_410">410</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_411">411</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_412">412</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_413">413</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_414">414</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_415">415</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_416">416</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_417">417</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_418">418</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_419">419</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_420">420</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_421">421</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_422">422</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_423">423</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_424">424</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_425">425</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_426">426</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_427">427</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_428">428</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_429">429</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_430">430</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_431">431</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_432">432</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_433">433</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_434">434</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_435">435</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_436">436</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_437">437</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_438">438</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_439">439</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_440">440</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_441">441</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_442">442</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_443">443</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_444">444</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_445">445</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_446">446</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_447">447</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_448">448</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_449">449</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_450">450</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_451">451</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_452">452</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_453">453</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_454">454</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_455">455</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_456">456</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_457">457</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_458">458</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_459">459</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_460">460</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_461">461</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_462">462</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_463">463</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_464">464</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_465">465</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_466">466</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_467">467</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_468">468</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_469">469</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_470">470</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_471">471</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_472">472</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_473">473</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_474">474</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_475">475</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_476">476</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_477">477</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_478">478</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_479">479</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_480">480</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_481">481</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_482">482</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_483">483</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_484">484</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_485">485</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_486">486</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_487">487</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_488">488</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_489">489</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_490">490</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_491">491</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_492">492</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_493">493</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_494">494</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_495">495</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_496">496</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_497">497</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_498">498</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_499">499</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_500">500</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_501">501</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_502">502</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_503">503</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_504">504</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_505">505</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_506">506</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_507">507</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_508">508</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_509">509</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_510">510</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_511">511</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_512">512</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_513">513</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_514">514</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_515">515</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_516">516</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_517">517</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_518">518</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_519">519</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_520">520</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_521">521</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_522">522</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_523">523</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_524">524</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_525">525</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_526">526</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_527">527</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_528">528</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_529">529</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_530">530</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_531">531</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_532">532</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_533">533</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_534">534</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_535">535</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_536">536</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_537">537</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_538">538</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_539">539</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_540">540</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_541">541</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_542">542</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_543">543</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_544">544</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_545">545</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_546">546</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_547">547</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_548">548</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_549">549</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_550">550</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_551">551</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_552">552</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_553">553</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_554">554</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_555">555</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_556">556</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_557">557</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_558">558</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_559">559</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_560">560</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_561">561</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_562">562</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_563">563</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_564">564</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_565">565</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_566">566</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_567">567</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_568">568</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_569">569</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_570">570</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_571">571</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_572">572</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_573">573</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_574">574</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_575">575</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_576">576</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_577">577</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_578">578</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_579">579</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_580">580</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_581">581</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_582">582</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_583">583</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_584">584</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_585">585</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_586">586</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_587">587</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_588">588</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_589">589</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_590">590</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_591">591</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_592">592</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_593">593</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_594">594</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_595">595</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_596">596</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_597">597</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_598">598</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_599">599</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_600">600</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_601">601</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_602">602</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_603">603</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_604">604</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_605">605</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_606">606</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_607">607</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_608">608</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_609">609</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_610">610</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_611">611</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_612">612</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_613">613</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_614">614</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_615">615</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_616">616</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_617">617</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_618">618</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_619">619</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_620">620</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_621">621</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_622">622</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_623">623</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_624">624</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_625">625</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_626">626</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_627">627</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_628">628</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_629">629</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_630">630</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_631">631</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_632">632</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_633">633</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_634">634</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_635">635</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_636">636</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_637">637</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_638">638</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_639">639</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_640">640</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_641">641</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_642">642</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_643">643</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_644">644</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_645">645</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_646">646</a>
+<a class="circle" href="Javascript:void(0);" id="seggio_647">647</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_648">648</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_649">649</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_650">650</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_651">651</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_652">652</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_653">653</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_654">654</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_655">655</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_656">656</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_657">657</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_658">658</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_659">659</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_660">660</a>
+<a class="true circle" href="Javascript:void(0);" id="seggio_661">661</a>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const emiciclo = document.getElementById('emiciclo');
+            const html = document.documentElement;
+
+            // Applica il tema scuro/chiaro all'iframe in base al genitore
+            const params = new URLSearchParams(window.location.search);
+            const theme = params.get('theme') || 'light';
+            html.setAttribute('data-theme', theme);
+
+            // 1. Ascolta i click sui seggi
+            emiciclo.addEventListener('click', function(e) {
+                // Cerca il link <a> genitore, se l'utente clicca il numero <span>
+                const seatElement = e.target.closest('a[id^="seggio_"]');
+                
+                if (seatElement && !seatElement.classList.contains('true')) {
+                    const seatId = seatElement.id.split('_')[1];
+                    // Manda un messaggio al genitore (training.html)
+                    window.parent.postMessage({ type: 'seatClick', seat: seatId }, '*');
+                }
+            });
+
+            // 2. Ascolta i messaggi DAL genitore (per mostrare le risposte)
+            window.addEventListener('message', function(event) {
+                const data = event.data;
+                
+                if (data.type === 'showAnswer') {
+                    // Disabilita altri click
+                    emiciclo.classList.add('disabled');
+                    
+                    const correctSeatEl = document.getElementById('seggio_' + data.correct);
+                    const guessedSeatEl = document.getElementById('seggio_' + data.guessed);
+                    
+                    if (data.guessed === data.correct) {
+                        if(correctSeatEl) correctSeatEl.classList.add('correct-guess');
+                    } else {
+                        if(guessedSeatEl) guessedSeatEl.classList.add('incorrect-guess');
+                        if(correctSeatEl) correctSeatEl.classList.add('truth');
+                    }
+                }
+                
+                if (data.type === 'reset') {
+                    // Ri-abilita i click
+                    emiciclo.classList.remove('disabled');
+                    
+                    // Rimuovi tutte le classi di feedback
+                    document.querySelectorAll('.correct-guess, .incorrect-guess, .truth').forEach(el => {
+                        el.classList.remove('correct-guess', 'incorrect-guess', 'truth');
+                    });
+                }
+                
+                if (data.type === 'setTheme') {
+                     html.setAttribute('data-theme', data.theme);
+                }
+            });
+            
+            // Invia messaggio "pronto" al genitore
+             window.parent.postMessage({ type: 'iframeReady' }, '*');
+        });
+    </script>
+</body>
+</html>

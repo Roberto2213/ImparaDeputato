@@ -1,0 +1,166 @@
+body{ 
+	margin:0;
+	padding:0;
+}
+#dove_siedono{
+	min-height:800px;
+}
+#elenco_seggi_container{
+	margin:0;
+	padding:15px 0 0 0;
+	width:100%;
+	text-align:center;
+}
+#emiciclo{ 
+	position:relative;
+}
+#emiciclo .circle{
+	padding:2px;
+	width:2px;
+	height:2px;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+	background-color:#000; 
+	color:#000!important; 
+	border:solid 1px #666;
+	font-size:1px;
+	line-height:2px;
+	text-decoration:none;	
+}
+#emiciclo .true{
+	padding:2px;
+	width:2px;
+	height:2px;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+	background-color:#fff; 
+	color:#fff!important; 
+	border:solid 1px #ddd;
+	font-size:1px;
+	line-height:2px;
+	text-decoration:none;	
+}
+#emiciclo #aggiornamento{
+	position:absolute;
+	top:15pt;
+	left:5pt;
+	text-align:left;
+	font-size:10px;
+}
+#legenda{
+	margin-top:400px;
+}
+#legenda ul{
+	list-style-type:none;
+	margin:0;
+	padding:0;
+}
+
+#legenda li{
+	min-height:12px;
+	line-height:12px;
+	font-size:10px;
+	margin:3px 0;
+	padding:2px;
+	text-align:left;
+}
+
+#legenda li span{
+	display:inline-block;
+	margin:0 2px 0 0;
+	padding:0;
+	width:14px;
+	text-align:right;
+}
+
+#legenda li span.colore{
+	background-color:#CCC;
+	color:#CCC;
+	border:1px solid #FFF;
+}
+#legenda li span.------ {
+	background-color:#C7C7C7 !important;
+	color:#C7C7C7 !important;
+	border:1px solid #FFF;
+}
+
+#legenda .disabilitata{
+	background-color:#000; 
+	color:#000; 
+	border:1px solid #CCC;	
+}
+#legenda li span.true{
+	background-color:#000; 
+	color:#000; 
+	border:1px solid #CCC;	
+}
+
+#legenda #legenda_title{
+	margin:5px 0;
+}
+#gruppi_tile{
+	position:absolute;
+	top:300pt;
+	left:10pt;
+	width:45px;
+	height:12px;
+	line-height:12px;
+	font-size:11px;
+	text-align:center;
+	padding:2px;
+}
+#gruppi{
+}
+#componenti_title{
+	position:absolute;
+	top:300pt;
+	left:210pt;
+	width:75px;
+	height:12px;
+	line-height:12px;
+	font-size:11px;
+}
+#componenti{
+}
+.starred{
+	background-image:url(http://documenti.camera.it/leg18/dati_dovesiedono/img/bull/bull_selezionato.gif);
+	background-position:0 0;
+	padding:0 2px 0 2px;
+	width:5px;
+	height:9px;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	border-radius:50%;
+	background-color:#FFF;
+	font-size:1px;
+	line-height:6px;
+}
+.starred a{
+	color:#666!important;
+	text-decoration:none;
+}
+#balloon #contentWrapper{
+	margin:0;
+	padding:0;
+}
+#minischeda_wrapper{
+	display:none;
+}
+#text_wrapper_minischeda{
+	margin:4px 3px 3px 3px;
+	padding:0;
+	width:100px;
+	float:left;
+}
+
+#emiciclo .noniscritto.circle, #gruppi .noniscritto {
+	background-color:#C7C7C7!important;
+	color:#C7C7C7!important;
+}
+
+#foto_wrapper_minischeda{
+	margin:4px 3px 3px 3px;
+	padding:0;
+}
