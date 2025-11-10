@@ -1,13 +1,32 @@
-const CACHE_NAME = 'allenamento-deputati-v1';
-// Lista di file e rotte da mettere in cache subito.
+// 1. CAMBIA IL NOME DELLA CACHE! (es. da v1 a v2)
+const CACHE_NAME = 'allenamento-deputati-v2';
+
+// 2. AGGIUNGI TUTTI I FILE DELL'APP SHELL
 const URLS_TO_CACHE = [
-  '/', // La pagina principale
-  '/api/deputies',
-  '/api/groups',
-  '/static/manifest.json' 
-  // Le icone sono già referenziate nel manifest, ma possiamo aggiungerle per sicurezza
-  // '/static/icons/icon-192x192.png',
-  // '/static/icons/icon-512x512.png'
+  '/', // La pagina principale (training.html)
+  
+  // Pagine HTML dell'emiciclo
+  '/static/emiciclo.html', // <-- AGGIUNTO
+  '/static/emiciclo_quiz.html', // <-- AGGIUNTO
+  
+  // CSS necessari (visti in emiciclo.html)
+  '/static/dove_siedono.css', // <-- AGGIUNTO
+  '/static/posizioni.css', // <-- AGGIUNTO
+  '/static/gruppi.css', // <-- AGGIUNTO
+  '/static/componenti.css', // <-- AGGIUNTO
+
+  // Manifest e icone (buona pratica)
+  '/static/manifest.json', // Già presente nel file originale
+  '/static/icons/icon-192x192.png', // <-- AGGIUNTO (dal manifest.json)
+  '/static/icons/icon-512x512.png'  // <-- AGGIUNTO (dal manifest.json)
+
+  /*
+  Considera di aggiungere anche i file audio se sono cruciali per l'esperienza offline:
+  '/static/audio/correct.wav',
+  '/static/audio/incorrect.wav',
+  '/static/audio/buzzer_blu.wav',
+  ... etc.
+  */
 ];
 
 // 1. Evento "install": viene eseguito quando il service worker viene installato.
