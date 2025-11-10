@@ -1,5 +1,5 @@
 // 1. CAMBIA IL NOME DELLA CACHE! (es. da v1 a v2)
-const CACHE_NAME = 'allenamento-deputati-v2';
+const CACHE_NAME = 'allenamento-deputati-v3';
 
 // 2. AGGIUNGI TUTTI I FILE DELL'APP SHELL
 const URLS_TO_CACHE = [
@@ -29,9 +29,8 @@ const URLS_TO_CACHE = [
   */
 ];
 
-// 1. Evento "install": viene eseguito quando il service worker viene installato.
+// 1. Evento "install"
 self.addEventListener('install', event => {
-  // Aspetta che la cache sia pronta prima di completare l'installazione.
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -39,7 +38,12 @@ self.addEventListener('install', event => {
         return cache.addAll(URLS_TO_CACHE);
       })
   );
+  
+  // <-- AGGIUNGI QUESTA RIGA
+  // Forza il service worker a passare dallo stato "waiting" ad "active"
+  self.skipWaiting();
 });
+
 
 // 2. Evento "fetch": si attiva ogni volta che la pagina fa una richiesta di rete (es. per un'immagine, un file API, etc.).
 self.addEventListener('fetch', event => {
@@ -85,8 +89,7 @@ self.addEventListener('fetch', event => {
 });
 
 
-// 3. Evento "activate": si attiva quando il nuovo service worker diventa attivo.
-// Utile per pulire le vecchie cache.
+// 3. Evento "activate"
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -94,11 +97,14 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
-            // Se la cache non è nella nostra "whitelist", cancellala.
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(() => {
+      // <-- AGGIUNGI QUESTA RIGA
+      // Prende il controllo immediato di tutte le pagine aperte
+      return self.clients.claim();
     })
   );
 });
