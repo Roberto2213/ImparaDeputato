@@ -6,96 +6,131 @@
     <title>Emiciclo Quiz</title>
     <link href="dove_siedono.css" media="all" rel="stylesheet" type="text/css" />
     <link href="posizioni.css" media="all" rel="stylesheet" type="text/css" />
-    <style>
-        :root {
-            --bg-quiz: #f0f2f5;
-            --seat-color: #d1d5db; /* Grigio base */
-            --seat-border: #9ca3af;
-            --seat-hover: #9ca3af;
-            --seat-correct: #10b981; /* Verde successo */
-            --seat-incorrect: #ef4444; /* Rosso errore */
-            --seat-truth: #6366f1; /* Viola (per mostrare la verità) */
-        }
-        [data-theme="dark"] {
-            --bg-quiz: #0f172a;
-            --seat-color: #334155; /* Grigio scuro */
-            --seat-border: #475569;
-            --seat-hover: #475569;
-            --seat-correct: #34d399;
-            --seat-incorrect: #f87171;
-            --seat-truth: #818cf8;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-quiz);
-            margin: 0;
-            padding: 0;
-            padding-top: 0 !important;
-            transition: background-color 0.3s ease;
-        }
-        #dove_siedono { min-height: 800px; margin-top: 0; }
-        #app-header, #legenda { display: none; } /* Nasconde header e legenda */
+   <style>
+    :root {
+        --bg-quiz: #f0f2f5;
+        --seat-color: #d1d5db; /* Grigio base */
+        --seat-border: #9ca3af;
+        --seat-hover-bg: #9ca3af;
+        --seat-hover-border: #6b7280;
+        --seat-correct: #10b981; /* Verde successo */
+        --seat-incorrect: #ef4444; /* Rosso errore */
+        --seat-truth: #6366f1; /* Viola (per mostrare la verità) */
+        --seat-empty-border: #b0b8c2;
+    }
+    [data-theme="dark"] {
+        --bg-quiz: #0f172a;
+        --seat-color: #334155; /* Grigio scuro */
+        --seat-border: #475569;
+        --seat-hover-bg: #475569;
+        --seat-hover-border: #64748b;
+        --seat-correct: #34d399;
+        --seat-incorrect: #f87171;
+        --seat-truth: #818cf8;
+        --seat-empty-border: #475569;
+    }
+    
+    /* --- NUOVA IMPOSTAZIONE BODY --- */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-quiz);
+        margin: 0;
+        padding: 0;
+        padding-top: 0 !important;
+        transition: background-color 0.3s ease;
+        
+        /* 1. Trasforma il body in un contenitore flex per centrare */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100vw; /* 100% larghezza viewport */
+        height: 100vh; /* 100% altezza viewport */
+        overflow: hidden; /* Nasconde lo scorrimento */
+        box-sizing: border-box;
+    }
+    
+    /* Resetta #dove_siedono, non ci serve più per il layout */
+    #dove_siedono { 
+        min-height: 0; 
+        margin: 0;
+        padding: 0;
+    }
 
-        /* --- STILI CHIAVE DEL QUIZ --- */
+    #app-header, #legenda, #aggiornamento { display: none; }
 
-        /* 1. Stile base per tutti i seggi (neutro) */
-        #emiciclo a[id^="seggio_"] {
-            background: var(--seat-color) !important;
-            border: 1px solid var(--seat-border) !important;
-            color: transparent !important; /* Nasconde il numero del seggio */
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+    /* --- NUOVA IMPOSTAZIONE #emiciclo --- */
+    #emiciclo {
+        position: relative;
         
-        /* 2. Stile per i seggi vuoti (leggermente diverso) */
-        #emiciclo a.true {
-             background: transparent !important;
-             border: 1px dashed var(--seat-border) !important;
-             pointer-events: none; /* Non cliccabili */
-             cursor: not-allowed;
-        }
+        /* 2. Dà a #emiciclo una dimensione fissa in 'pt' 
+           (basata sul layout di posizioni.css) */
+        width: 360pt; 
+        height: 300pt;
 
-        /* 3. Hover (solo su seggi cliccabili) */
-        #emiciclo a[id^="seggio_"]:not(.true):hover {
-            -webkit-transform: scale(3.5);
-            transform: scale(3.5);
-            z-index: 9999;
-            background: var(--seat-hover) !important;
-            border: 2px solid var(--seat-hover) !important;
-        }
-        
-        /* 4. Disabilita tutti gli eventi dopo un click */
-        #emiciclo.disabled a {
-            pointer-events: none !important;
-            cursor: default !important;
-        }
+        /* 3. Scala questo "foglio" centrato */
+        transform: scale(1.7); /* Prova a cambiare questo (es. 1.8 o 1.5) */
+        transform-origin: center;
+    }
 
-        /* --- STILI FEEDBACK --- */
-        
-        /* La risposta CORRETTA data dall'utente */
-        #emiciclo a.correct-guess {
-            background: var(--seat-correct) !important;
-            border-color: #fff !important;
-            transform: scale(4) !important;
-            z-index: 10000;
-        }
-        
-        /* La risposta SBAGLIATA data dall'utente */
-        #emiciclo a.incorrect-guess {
-            background: var(--seat-incorrect) !important;
-            border-color: #fff !important;
-            transform: scale(4) !important;
-            z-index: 10000;
-        }
-        
-        /* La VERA risposta (se l'utente ha sbagliato) */
-        #emiciclo a.truth {
-            background: var(--seat-truth) !important;
-            border-color: #fff !important;
-            transform: scale(4) !important;
-            z-index: 10000;
-        }
-    </style>
+    /* --- STILI DEI SEGGI (invariati) --- */
+    #emiciclo a[id^="seggio_"] {
+        width: 8px;
+        height: 6px;
+        padding: 0;
+        border-radius: 2px;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        font-size: 1px;
+        line-height: 6px;
+        background: var(--seat-color) !important;
+        border: 1px solid var(--seat-border) !important;
+        color: transparent !important;
+        cursor: pointer;
+        transition: all 0.2s ease-out;
+    }
+    
+    #emiciclo a.true {
+         background: transparent !important;
+         border: 1px dashed var(--seat-empty-border) !important;
+         pointer-events: none;
+         cursor: not-allowed;
+         box-shadow: none;
+    }
+
+    #emiciclo a[id^="seggio_"]:not(.true):hover {
+        -webkit-transform: scale(4.0) translateY(-2px);
+        transform: scale(4.0) translateY(-2px);
+        z-index: 9999;
+        background: var(--seat-hover-bg) !important;
+        border: 2px solid var(--seat-hover-border) !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+    
+    #emiciclo.disabled a {
+        pointer-events: none !important;
+        cursor: default !important;
+    }
+
+    /* --- STILI FEEDBACK (invariati) --- */
+    .feedback-seat {
+        -webkit-transform: scale(4.5) translateY(-3px) !important;
+        transform: scale(4.5) translateY(-3px) !important;
+        z-index: 10000;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        border: 2px solid #ffffff !important;
+    }
+
+    #emiciclo a.correct-guess {
+        background: var(--seat-correct) !important;
+    }
+    
+    #emiciclo a.incorrect-guess {
+        background: var(--seat-incorrect) !important;
+    }
+    
+    #emiciclo a.truth {
+        background: var(--seat-truth) !important;
+    }
+</style>
 </head>
 <body>
     <div id="dove_siedono">

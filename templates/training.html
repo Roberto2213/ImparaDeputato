@@ -30,6 +30,7 @@
             --border: #e5e7eb;
             --shadow: rgba(0, 0, 0, 0.1);
             --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --anim-speed: 0.2s; /* Velocità animazione */
         }
 
         [data-theme="dark"] {
@@ -66,7 +67,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            transition: background 0.3s ease, color 0.3s ease;
+            transition: background var(--anim-speed) ease, color var(--anim-speed) ease;
         }
 
         .container {
@@ -77,7 +78,7 @@
             border-radius: 24px;
             box-shadow: var(--card-shadow);
             position: relative;
-            transition: background 0.3s ease;
+            transition: background var(--anim-speed) ease;
         }
 
         .theme-toggle {
@@ -94,7 +95,7 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            transition: all 0.3s ease;
+            transition: all var(--anim-speed) ease;
             z-index: 1001;
         }
 
@@ -125,12 +126,20 @@
            font-size: 2.2rem;
            margin-bottom: 20px;
         }
+        
+        h3 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            text-align: center;
+            color: var(--text-primary);
+            margin-top: 20px;
+        }
 
         .form-group {
             margin: 30px 0;
         }
         
-        #search-filters .form-group {
+        #search-filters .form-group, #selection-filters .form-group {
              margin: 0; 
         }
         
@@ -152,7 +161,8 @@
         }
 
         #group-select, #rounds-input, #game-mode-select, #lastname-input, #group-guess-select, #seat-input,
-        #search-cognome-input, #search-nome-input, #search-gruppo-select, #search-committee-select {
+        #search-cognome-input, #search-nome-input, #search-gruppo-select, #search-committee-select,
+        #deputy-source-select, #select-cognome-input, #select-nome-input, #select-gruppo-select, #select-committee-select {
             width: 100%;
             padding: 16px 20px;
             font-size: 1rem;
@@ -162,11 +172,12 @@
             background: var(--bg-secondary);
             color: var(--text-primary);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--anim-speed) ease;
             appearance: none;
         }
         
-        #rounds-input, #lastname-input, #search-cognome-input, #search-nome-input, #seat-input {
+        #rounds-input, #lastname-input, #search-cognome-input, #search-nome-input, #seat-input,
+        #select-cognome-input, #select-nome-input {
              appearance: textfield;
              cursor: text;
         }
@@ -184,7 +195,8 @@
             -moz-appearance: textfield;
         }
 
-        #group-select, #game-mode-select, #group-guess-select, #search-gruppo-select, #search-committee-select {
+        #group-select, #game-mode-select, #group-guess-select, #search-gruppo-select, #search-committee-select,
+        #deputy-source-select, #select-gruppo-select, #select-committee-select {
             padding-right: 45px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
@@ -193,12 +205,14 @@
         }
 
         #group-select:hover, #rounds-input:hover, #game-mode-select:hover, #lastname-input:hover, #group-guess-select:hover, #seat-input:hover,
-        #search-cognome-input:hover, #search-nome-input:hover, #search-gruppo-select:hover, #search-committee-select:hover {
+        #search-cognome-input:hover, #search-nome-input:hover, #search-gruppo-select:hover, #search-committee-select:hover,
+        #deputy-source-select:hover, #select-cognome-input:hover, #select-nome-input:hover, #select-gruppo-select:hover, #select-committee-select:hover {
             border-color: var(--accent-primary);
         }
 
         #group-select:focus, #rounds-input:focus, #game-mode-select:focus, #lastname-input:focus, #group-guess-select:focus, #seat-input:focus,
-        #search-cognome-input:focus, #search-nome-input:focus, #search-gruppo-select:focus, #search-committee-select:focus {
+        #search-cognome-input:focus, #search-nome-input:focus, #search-gruppo-select:focus, #search-committee-select:focus,
+        #deputy-source-select:focus, #select-cognome-input:focus, #select-nome-input:focus, #select-gruppo-select:focus, #select-committee-select:focus {
             outline: none;
             border-color: var(--accent-primary);
             box-shadow: 0 0 0 3px var(--accent-light);
@@ -227,7 +241,7 @@
             border: none;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--anim-speed) ease;
             flex: 1;
         }
 
@@ -249,7 +263,7 @@
             border: 2px solid var(--accent-primary);
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--anim-speed) ease;
         }
         
         .btn-secondary-full {
@@ -262,7 +276,7 @@
             border: 2px solid var(--accent-primary);
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--anim-speed) ease;
             flex: 1;
         }
 
@@ -336,7 +350,7 @@
             border: 2px solid var(--border);
             border-radius: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--anim-speed) ease;
             display: flex;
             flex-direction: column;
             gap: 6px;
@@ -455,6 +469,63 @@
             text-align: center;
         }
         
+        /* --- STILI RIEPILOGO FINE GIOCO --- */
+        #results-summary-container {
+            margin-top: 20px;
+            margin-bottom: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 8px;
+        }
+
+        .result-summary-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .result-summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-summary-thumb {
+            width: 50px;
+            height: 66px;
+            object-fit: cover;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .result-summary-info .name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+        }
+
+        .result-summary-info .group {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .result-summary-icon {
+            font-size: 1.5rem;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        
+        .result-summary-icon.correct {
+            color: var(--success);
+        }
+        
+        .result-summary-icon.incorrect {
+            color: var(--error);
+        }
+
+        
         /* --- STILI SCHERMATA DI RICERCA --- */
         #search-header {
             display: flex;
@@ -465,14 +536,13 @@
         
         #search-filters {
             display: grid;
-            grid-template-columns: 1fr; /* Default mobile, 1 colonna */
+            grid-template-columns: 1fr;
             gap: 20px;
         }
         
-        /* Griglia 2x2 per desktop */
         @media (min-width: 768px) {
              #search-filters {
-                grid-template-columns: 1fr 1fr; /* 2 colonne */
+                grid-template-columns: 1fr 1fr;
             }
         }
         
@@ -492,7 +562,7 @@
             padding: 12px;
             border-radius: 12px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: background-color var(--anim-speed) ease;
         }
         
         .search-result-item:hover {
@@ -523,8 +593,72 @@
             padding: 40px;
             color: var(--text-secondary);
         }
+        
+        /* --- STILI SCHERMATA SELEZIONE (MODIFICATI) --- */
+        #selection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        /* Contenitore per i nuovi pulsanti */
+        #selection-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap; /* Permette ai pulsanti di andare a capo */
+        }
 
-        /* --- STILI MODALE DETTAGLI --- */
+        #selection-counter {
+            margin-right: 8px;
+            font-weight: 600; 
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+        
+        #selection-filters {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+             #selection-filters {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        #selection-results-container {
+            margin-top: 30px;
+            max-height: calc(100vh - 350px); 
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 8px;
+        }
+
+        .selection-result-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color var(--anim-speed) ease, border var(--anim-speed) ease;
+            border: 2px solid transparent;
+        }
+        
+        .selection-result-item:hover {
+            background-color: var(--bg-secondary);
+        }
+        
+        .selection-result-item.selected {
+            background-color: var(--accent-light);
+            border-color: var(--accent-primary);
+        }
+
+        /* --- STILI MODALE DETTAGLI (Z-INDEX MODIFICATO) --- */
         #modal-overlay {
             position: fixed;
             top: 0;
@@ -535,8 +669,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
+            z-index: 3000; /* Sopra la mappa emiciclo */
+            animation: fadeIn var(--anim-speed) ease;
         }
         
         #modal-overlay.hidden {
@@ -552,9 +686,9 @@
             max-width: 400px;
             width: 90%;
             text-align: center;
-            animation: zoomIn 0.3s ease;
-            max-height: 90vh; /* Limita altezza modale */
-            overflow-y: auto; /* Aggiunge scroll se contenuto sfora */
+            animation: zoomIn var(--anim-speed) ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         #modal-close-btn {
@@ -570,8 +704,8 @@
             font-size: 1.2rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
-            z-index: 10; /* Aggiunto per stare sopra la grid */
+            transition: all var(--anim-speed) ease;
+            z-index: 3001; /* Sopra la modale */
         }
         
         #modal-close-btn:hover {
@@ -643,7 +777,6 @@
             font-weight: 700;
          }
          
-        /* --- STILI PER SEGGIO E IFRAME --- */
         #modal-seat {
             font-weight: 600;
             color: var(--accent-primary);
@@ -655,55 +788,49 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             margin-top: 16px;
-            background: var(--bg-secondary); /* Sfondo durante il caricamento */
+            background: var(--bg-secondary);
         }
         
-        /* Layout di default per la colonna info */
         #modal-info-col {
             text-align: center;
         }
 
-        /* --- NUOVI STILI MODALE DESKTOP A 2 COLONNE --- */
         @media (min-width: 1024px) {
             #modal-content {
-                max-width: 950px; /* Larghezza aumentata */
+                max-width: 950px;
                 width: 90%;
-                
                 display: grid;
-                /* Colonna 1: 300px per le info. Colonna 2: tutto il resto */
                 grid-template-columns: 300px 1fr; 
                 gap: 24px;
-                
                 padding: 24px;
-                text-align: left; /* Resetta il text-align: center */
-                
-                max-height: 90vh; /* Limita altezza anche su desktop */
-                overflow: hidden; /* Nasconde scroll principale */
+                text-align: left;
+                max-height: 90vh;
+                overflow: hidden;
             }
             
             #modal-info-col {
-                text-align: left; /* Allinea info a sinistra */
+                text-align: left;
                 display: flex;
                 flex-direction: column;
-                justify-content: flex-start; /* Allinea dall'alto */
-                height: 100%; /* Occupa altezza griglia */
-                max-height: calc(90vh - 48px); /* Altezza max - padding */
-                overflow-y: auto; /* Scroll solo per questa colonna */
+                justify-content: flex-start;
+                height: 100%;
+                max-height: calc(90vh - 48px);
+                overflow-y: auto;
             }
             
             #modal-image {
-                width: 280px; /* Mantiene larghezza originale */
-                height: 373px; /* Mantiene altezza originale */
-                margin: 0; /* Rimuove margin-bottom */
+                width: 280px;
+                height: 373px;
+                margin: 0;
             }
             
             #modal-name {
-                margin-top: 20px; /* Aggiunge spazio sopra il nome */
+                margin-top: 20px;
             }
             
             #modal-emiciclo {
                 width: 100%;
-                height: calc(90vh - 48px); /* Occupa tutta l'altezza (meno padding) */
+                height: calc(90vh - 48px);
                 margin-top: 0;
                 border-radius: 16px;
             }
@@ -715,8 +842,97 @@
                 text-align: left;
             }
         }
-        /* --- FINE NUOVI STILI --- */
 
+        /* --- STILI MODALE EMICICLO FULLSCREEN (Z-INDEX 2000) --- */
+        #emiciclo-view-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-secondary);
+            z-index: 2000; /* Sotto la modale dettaglio */
+            animation: fadeIn var(--anim-speed) ease;
+            transition: opacity var(--anim-speed) ease;
+        }
+        
+        #emiciclo-view-overlay.fade-out {
+            opacity: 0;
+        }
+        
+        #emiciclo-view-overlay.hidden {
+            display: none;
+            opacity: 1;
+        }
+        
+        #emiciclo-view-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--anim-speed) ease;
+            z-index: 2002;
+        }
+        
+        #emiciclo-view-close-btn:hover {
+            background: var(--error-bg);
+            color: var(--error);
+        }
+        
+        #emiciclo-view-content {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        #emiciclo-view-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: var(--bg-secondary);
+        }
+        
+        #emiciclo-view-legend {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 10px;
+            z-index: 2001;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .group-label {
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        #label-avs { background: #FFA219; color: #000;}
+        #label-pd { background: #FF0000; color: #fff;}
+        #label-m5s { background: #FFFF00; color: #000; }
+        #label-aziv { background: #CC66FF; color: #fff; }
+        #label-misto { background: #7C7C7C; color: #fff;}
+        #label-fi { background: #09ffff; color: #000;}
+        #label-nm { background: #FF33cc; color: #fff;}
+        #label-lega { background: #33cc33; color: #000;}
+        #label-fdi { background: #0b52fc; color: #fff;}
 
         @media (max-width: 768px) {
             .container {
@@ -737,6 +953,28 @@
                 top: 15px;
                 right: 15px;
             }
+            
+            #emiciclo-view-legend {
+                grid-template-columns: 1fr 1fr;
+                gap: 5px;
+                padding: 8px;
+                font-size: 0.7rem;
+            }
+            
+            #selection-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            #selection-header-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+            #selection-select-all-visible-btn, 
+            #selection-deselect-all-visible-btn {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
         }
         
         .manual-layout-grid {
@@ -755,10 +993,9 @@
             }
         }
 
-        /* Stile per l'iframe del quiz */
         #quiz-emiciclo-iframe {
             width: 100%;
-            height: 850px; /* Altezza generosa per contenere l'emiciclo */
+            height: 850px;
             border: none;
             border-radius: 16px;
             background: var(--bg-secondary);
@@ -766,28 +1003,17 @@
 
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         @keyframes zoomIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-
         .container > div:not(.hidden) {
-            animation: fadeIn 0.4s ease;
+            animation: fadeIn var(--anim-speed) ease;
         }
 
         .site-footer {
@@ -807,7 +1033,7 @@
             color: var(--accent-primary);
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: all var(--anim-speed) ease;
         }
 
         .site-footer a:hover {
@@ -838,12 +1064,27 @@
             </div>
             
             <div class="form-group">
+                <label for="deputy-source-select">Fonte Deputati</label>
+                <div class="custom-select">
+                    <select id="deputy-source-select">
+                        <option value="all">Tutti i deputati (filtrati per gruppo)</option>
+                        <option value="manual">Seleziona manualmente</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="manual-selection-controls" class="form-group hidden">
+                <button class="btn-secondary-full" id="open-selection-modal-btn">Seleziona Deputati...</button>
+                <p id="selected-count-info" class="info-text">0 deputati selezionati</p>
+            </div>
+            
+            <div class="form-group" id="group-select-container">
                 <label for="group-select">Scegli un Gruppo Parlamentare</label>
                 <div class="custom-select">
                     <select id="group-select"></select>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="rounds-input-container">
                 <label for="rounds-input">Numero di Deputati da Indovinare</label>
                 <input type="number" id="rounds-input" value="10" min="1" max="100">
             </div>
@@ -947,13 +1188,21 @@
         <div id="end-screen" class="hidden">
             <h1>Sessione Terminata!</h1>
             <p id="final-score-text">Punteggio Finale: 8 / 10</p>
+            
+            <h3>Riepilogo Sessione</h3>
+            <div id="results-summary-container">
+            </div>
+            
             <button class="btn-primary" id="restart-btn">Allenati Ancora</button>
         </div>
         
         <div id="search-screen" class="hidden">
             <div id="search-header">
                 <h2>Cerca Deputato</h2>
-                <button id="search-back-btn" class="btn-secondary">Indietro</button>
+                <div>
+                    <button id="view-emiciclo-btn" class="btn-secondary" style="margin-right: 10px;">Visualizza Emiciclo</button>
+                    <button id="search-back-btn" class="btn-secondary">Indietro</button>
+                </div>
             </div>
             
             <div id="search-filters">
@@ -980,6 +1229,44 @@
             </div>
             
             <div id="search-results-container">
+            </div>
+        </div>
+        
+        <div id="selection-screen" class="hidden">
+            <div id="selection-header">
+                <h2>Seleziona Deputati</h2>
+                <div id="selection-header-actions">
+                    <button id="selection-select-all-visible-btn" class="btn-secondary">Seleziona Visibili</button>
+                    <button id="selection-deselect-all-visible-btn" class="btn-secondary">Deseleziona Visibili</button>
+                    <span id="selection-counter">Selezionati: 0</span>
+                    <button id="selection-done-btn" class="btn-secondary">Conferma</button>
+                </div>
+            </div>
+            
+            <div id="selection-filters">
+                <div class="form-group">
+                    <label for="select-cognome-input">Cognome</label>
+                    <input type="text" id="select-cognome-input" placeholder="Es. Rossi">
+                </div>
+                <div class="form-group">
+                    <label for="select-nome-input">Nome</label>
+                    <input type="text" id="select-nome-input" placeholder="Es. Mario">
+                </div>
+                <div class="form-group">
+                    <label for="select-gruppo-select">Gruppo</label>
+                    <div class="custom-select">
+                        <select id="select-gruppo-select"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="select-committee-select">Commissione</label>
+                    <div class="custom-select">
+                        <select id="select-committee-select"></select>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="selection-results-container">
             </div>
         </div>
         
@@ -1013,6 +1300,25 @@
             <iframe id="modal-emiciclo" src="about:blank" title="Posizione Emiciclo" class="hidden"></iframe>
         </div>
     </div>
+    
+    <div id="emiciclo-view-overlay" class="hidden">
+        <button id="emiciclo-view-close-btn">×</button>
+        <div id="emiciclo-view-content">
+            <iframe id="emiciclo-view-iframe" src="about:blank" title="Mappa Emiciclo Completo"></iframe>
+            
+            <div id="emiciclo-view-legend">
+                <div class="group-label" id="label-fdi">Fratelli d'Italia</div>
+                <div class="group-label" id="label-lega">Lega</div>
+                <div class="group-label" id="label-fi">Forza Italia</div>
+                <div class="group-label" id="label-nm">Noi Moderati</div>
+                <div class="group-label" id="label-misto">Gruppo Misto</div>
+                <div class="group-label" id="label-aziv">Azione-Italia Viva</div>
+                <div class="group-label" id="label-m5s">Movimento 5 Stelle</div>
+                <div class="group-label" id="label-pd">Partito Democratico</div>
+                <div class="group-label" id="label-avs">Alleanza Verdi e Sinistra</div>
+            </div>
+        </div>
+    </div>
 
 
     <script>
@@ -1034,9 +1340,11 @@
             localStorage.setItem('theme', next);
             themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
             
-            // --- NUOVO: Sincronizza il tema con l'iframe del quiz ---
             if (quizEmicicloIframe.contentWindow) {
                 quizEmicicloIframe.contentWindow.postMessage({ type: 'setTheme', theme: next }, '*');
+            }
+            if (emicicloViewIframe.contentWindow) {
+                emicicloViewIframe.contentWindow.postMessage({ type: 'setTheme', theme: next }, '*');
             }
         });
 
@@ -1047,13 +1355,20 @@
             const gameScreen = document.getElementById('game-screen');
             const manualGameScreen = document.getElementById('manual-game-screen');
             const seatGameScreen = document.getElementById('seat-game-screen');
-            const clickSeatGameScreen = document.getElementById('click-seat-game-screen'); // NUOVO
+            const clickSeatGameScreen = document.getElementById('click-seat-game-screen');
             const endScreen = document.getElementById('end-screen');
-            const searchScreen = document.getElementById('search-screen'); 
+            const searchScreen = document.getElementById('search-screen');
+            const selectionScreen = document.getElementById('selection-screen');
             const modalOverlay = document.getElementById('modal-overlay'); 
 
             // Setup elements
-            const gameModeSelect = document.getElementById('game-mode-select'); 
+            const gameModeSelect = document.getElementById('game-mode-select');
+            const deputySourceSelect = document.getElementById('deputy-source-select');
+            const manualSelectionControls = document.getElementById('manual-selection-controls');
+            const openSelectionModalBtn = document.getElementById('open-selection-modal-btn');
+            const selectedCountInfo = document.getElementById('selected-count-info');
+            const groupSelectContainer = document.getElementById('group-select-container');
+            const roundsInputContainer = document.getElementById('rounds-input-container');
             const groupSelect = document.getElementById('group-select');
             const roundsInput = document.getElementById('rounds-input');
             const startBtn = document.getElementById('start-btn');
@@ -1091,7 +1406,7 @@
             const seatFeedbackText = document.getElementById('seat-feedback-text');
             const seatQuitBtn = document.getElementById('seat-quit-btn');
             
-            // Game elements (Click-Seat) - NUOVI
+            // Game elements (Click-Seat)
             const clickSeatProgressText = document.getElementById('click-seat-progress-text');
             const clickSeatScoreText = document.getElementById('click-seat-score-text');
             const clickSeatQuestionText = document.getElementById('click-seat-question-text');
@@ -1101,6 +1416,7 @@
 
             // End screen elements
             const finalScoreText = document.getElementById('final-score-text');
+            const resultsSummaryContainer = document.getElementById('results-summary-container');
             const restartBtn = document.getElementById('restart-btn');
             
             // Search elements
@@ -1110,6 +1426,18 @@
             const searchGruppoSelect = document.getElementById('search-gruppo-select');
             const searchCommitteeSelect = document.getElementById('search-committee-select');
             const searchResultsContainer = document.getElementById('search-results-container');
+            
+            // Selection Screen elements
+            const selectionCounter = document.getElementById('selection-counter');
+            const selectionDoneBtn = document.getElementById('selection-done-btn');
+            const selectCognomeInput = document.getElementById('select-cognome-input');
+            const selectNomeInput = document.getElementById('select-nome-input');
+            const selectGruppoSelect = document.getElementById('select-gruppo-select');
+            const selectCommitteeSelect = document.getElementById('select-committee-select');
+            const selectionResultsContainer = document.getElementById('selection-results-container');
+            const selectionSelectAllVisibleBtn = document.getElementById('selection-select-all-visible-btn');
+            const selectionDeselectAllVisibleBtn = document.getElementById('selection-deselect-all-visible-btn');
+
             
             // Modal elements
             const modalContent = document.getElementById('modal-content');
@@ -1123,6 +1451,12 @@
             const modalEmiciclo = document.getElementById('modal-emiciclo');
             const modalCommitteesContainer = document.getElementById('modal-committees-container');
             const modalCommittees = document.getElementById('modal-committees');
+            
+            // Elementi Modale Emiciclo
+            const viewEmicicloBtn = document.getElementById('view-emiciclo-btn');
+            const emicicloViewOverlay = document.getElementById('emiciclo-view-overlay');
+            const emicicloViewCloseBtn = document.getElementById('emiciclo-view-close-btn');
+            const emicicloViewIframe = document.getElementById('emiciclo-view-iframe');
 
 
             // Game state variables
@@ -1130,6 +1464,8 @@
             let allGroups = []; 
             let allGroupsNoTutti = []; 
             let sessionDeputies = [];
+            let sessionResults = [];
+            let customDeputyList = [];
             let currentQuestionIndex = 0;
             let score = 0;
             let totalRounds = 10;
@@ -1137,7 +1473,7 @@
             let nextQuestionTimeout = null;
             let currentGameMode = 'classic';
             let sessionGroupFilter = 'Tutti';
-            let iframeReady = false; // Flag per l'iframe del quiz
+            let iframeReady = false;
 
             async function initialize() {
                 const [deputiesRes, groupsRes, committeesRes] = await Promise.all([
@@ -1154,17 +1490,31 @@
                 const groupOptionsHTML = allGroups.map(g => `<option value="${g}">${g}</option>`).join('');
                 groupSelect.innerHTML = groupOptionsHTML;
                 searchGruppoSelect.innerHTML = groupOptionsHTML;
+                selectGruppoSelect.innerHTML = groupOptionsHTML;
                 
                 groupGuessSelect.innerHTML = `<option value="">Seleziona un gruppo...</option>` +
                     allGroupsNoTutti.map(g => `<option value="${g}">${g}</option>`).join('');
                 
                 const committeeOptionsHTML = committees.map(c => `<option value="${c}">${c}</option>`).join('');
                 searchCommitteeSelect.innerHTML = committeeOptionsHTML;
+                selectCommitteeSelect.innerHTML = committeeOptionsHTML;
                 
                 updateDeputyCount();
                 groupSelect.addEventListener('change', updateDeputyCount);
                 
                 renderSearchResults();
+                
+                deputySourceSelect.addEventListener('change', toggleDeputySourceControls);
+                openSelectionModalBtn.addEventListener('click', showSelectionScreen);
+                selectionDoneBtn.addEventListener('click', hideSelectionScreen);
+                
+                selectCognomeInput.addEventListener('input', renderSelectionList);
+                selectNomeInput.addEventListener('input', renderSelectionList);
+                selectGruppoSelect.addEventListener('change', renderSelectionList);
+                selectCommitteeSelect.addEventListener('change', renderSelectionList);
+                
+                selectionSelectAllVisibleBtn.addEventListener('click', selectAllVisible);
+                selectionDeselectAllVisibleBtn.addEventListener('click', deselectAllVisible);
             }
 
             function updateDeputyCount() {
@@ -1178,7 +1528,6 @@
                     : allDeputies.filter(d => d.simple_group === selectedGroup);
                 
                 if (currentMode === 'seat' || currentMode === 'click-seat') {
-                    // Per le modalità seggio, conta solo quelli con un seggio
                     availableCount = availableDeputies.filter(d => d.seat && d.seat !== 'N/D').length;
                 } else {
                     availableCount = availableDeputies.length;
@@ -1187,41 +1536,188 @@
                 deputyCountInfo.textContent = `${availableCount} deputati disponibili in questo gruppo`;
             }
             
-            // Aggiorna il count anche quando la modalità cambia
             gameModeSelect.addEventListener('change', updateDeputyCount);
 
-            // --- START TRAINING MODIFICATO ---
+            function toggleDeputySourceControls() {
+                const source = deputySourceSelect.value;
+                if (source === 'manual') {
+                    groupSelectContainer.classList.add('hidden');
+                    roundsInputContainer.classList.add('hidden');
+                    manualSelectionControls.classList.remove('hidden');
+                    deputyCountInfo.classList.add('hidden');
+                } else {
+                    groupSelectContainer.classList.remove('hidden');
+                    roundsInputContainer.classList.remove('hidden');
+                    manualSelectionControls.classList.add('hidden');
+                    deputyCountInfo.classList.remove('hidden');
+                    updateDeputyCount();
+                }
+            }
+            
+            function showSelectionScreen() {
+                setupScreen.classList.add('hidden');
+                selectionScreen.classList.remove('hidden');
+                renderSelectionList();
+                updateSelectionCounter();
+            }
+
+            function hideSelectionScreen() {
+                selectionScreen.classList.add('hidden');
+                setupScreen.classList.remove('hidden');
+                selectedCountInfo.textContent = `${customDeputyList.length} deputati selezionati`;
+            }
+
+            function renderSelectionList() {
+                const cognomeFilter = selectCognomeInput.value.toLowerCase().trim();
+                const nomeFilter = selectNomeInput.value.toLowerCase().trim();
+                const gruppoFilter = selectGruppoSelect.value;
+                const committeeFilter = selectCommitteeSelect.value;
+                
+                selectionResultsContainer.innerHTML = ''; 
+                
+                const filteredDeputies = allDeputies.filter(deputy => {
+                    const nameParts = deputy.name.toLowerCase().split('(')[0].trim().split(' ');
+                    const cognome = nameParts[0];
+                    const nome = nameParts.slice(1).join(' ');
+                    
+                    const matchCognome = cognome.startsWith(cognomeFilter);
+                    const matchNome = nome.startsWith(nomeFilter);
+                    const matchGruppo = (gruppoFilter === 'Tutti') || (deputy.simple_group === gruppoFilter);
+                    const matchCommittee = (committeeFilter === 'Tutte') || (deputy.committees.includes(committeeFilter));
+                    
+                    return matchCognome && matchNome && matchGruppo && matchCommittee;
+                });
+                
+                if (filteredDeputies.length === 0) {
+                    selectionResultsContainer.innerHTML = `<p id="no-results-text">Nessun deputato trovato.</p>`;
+                    return;
+                }
+                
+                filteredDeputies.forEach(deputy => {
+                    const item = document.createElement('div');
+                    item.className = 'selection-result-item';
+                    
+                    item.setAttribute('data-deputy-name', deputy.name); 
+                    
+                    const isSelected = customDeputyList.some(d => d.name === deputy.name);
+                    if (isSelected) {
+                        item.classList.add('selected');
+                    }
+                    
+                    item.innerHTML = `
+                        <img src="${deputy.photo_url}" class="result-thumb" alt="${deputy.name}">
+                        <div class="result-info">
+                            <div class="name">${deputy.name}</div>
+                            <div class="group">${deputy.group}</div>
+                        </div>
+                    `;
+                    item.addEventListener('click', () => toggleDeputySelection(deputy, item));
+                    selectionResultsContainer.appendChild(item);
+                });
+            }
+
+            function toggleDeputySelection(deputy, itemElement) {
+                const index = customDeputyList.findIndex(d => d.name === deputy.name);
+                if (index > -1) {
+                    customDeputyList.splice(index, 1);
+                    itemElement.classList.remove('selected');
+                } else {
+                    customDeputyList.push(deputy);
+                    itemElement.classList.add('selected');
+                }
+                updateSelectionCounter();
+            }
+
+             function updateSelectionCounter() {
+                selectionCounter.textContent = `Selezionati: ${customDeputyList.length}`;
+             }
+             
+            function selectAllVisible() {
+                const visibleItems = selectionResultsContainer.querySelectorAll('.selection-result-item');
+                
+                visibleItems.forEach(item => {
+                    const deputyName = item.getAttribute('data-deputy-name');
+                    const deputy = allDeputies.find(d => d.name === deputyName);
+                    if (!deputy) return;
+
+                    const isSelected = customDeputyList.some(d => d.name === deputy.name);
+                    if (!isSelected) {
+                        customDeputyList.push(deputy);
+                    }
+                    item.classList.add('selected');
+                });
+                updateSelectionCounter();
+            }
+
+            function deselectAllVisible() {
+                const visibleItems = selectionResultsContainer.querySelectorAll('.selection-result-item');
+                
+                visibleItems.forEach(item => {
+                    const deputyName = item.getAttribute('data-deputy-name');
+                    const index = customDeputyList.findIndex(d => d.name === deputyName);
+
+                    if (index > -1) {
+                        customDeputyList.splice(index, 1);
+                    }
+                    item.classList.remove('selected');
+                });
+                updateSelectionCounter();
+            }
+
             function startTraining() {
-                sessionGroupFilter = groupSelect.value;
-                totalRounds = parseInt(roundsInput.value, 10);
                 currentGameMode = gameModeSelect.value;
+                const source = deputySourceSelect.value;
+                let availableDeputies = [];
 
-                let availableDeputies = (sessionGroupFilter === 'Tutti')
-                    ? [...allDeputies]
-                    : allDeputies.filter(d => d.simple_group === sessionGroupFilter);
-
-                // --- FILTRO SPECIFICO PER MODALITÀ ---
+                if (source === 'manual') {
+                    if (customDeputyList.length === 0) {
+                        alert("Non hai selezionato nessun deputato per l'allenamento!");
+                        return;
+                    }
+                    availableDeputies = [...customDeputyList];
+                } else {
+                    sessionGroupFilter = groupSelect.value;
+                    totalRounds = parseInt(roundsInput.value, 10);
+                    
+                    let filteredByGroup = (sessionGroupFilter === 'Tutti')
+                        ? [...allDeputies]
+                        : allDeputies.filter(d => d.simple_group === sessionGroupFilter);
+                    
+                    availableDeputies = filteredByGroup;
+                }
+                
                 if (currentGameMode === 'seat' || currentGameMode === 'click-seat') {
                     availableDeputies = availableDeputies.filter(d => d.seat && d.seat !== 'N/D');
                     if (availableDeputies.length === 0) {
-                        alert("Non ci sono deputati con un seggio assegnato in questo gruppo per questa modalità.");
+                        const msg = source === 'manual' 
+                            ? "Nessuno dei deputati selezionati ha un seggio valido per questa modalità."
+                            : "Non ci sono deputati con un seggio assegnato in questo gruppo per questa modalità.";
+                        alert(msg);
                         return;
                     }
                 } else if (currentGameMode === 'classic' && availableDeputies.length < 4) {
-                    alert("Questo gruppo non ha abbastanza deputati (minimo 4) per iniziare l'allenamento.");
+                     const msg = source === 'manual'
+                        ? "Devi selezionare almeno 4 deputati per la modalità Classica."
+                        : "Questo gruppo non ha abbastanza deputati (minimo 4) per iniziare l'allenamento.";
+                    alert(msg);
                     return;
-                } else if (availableDeputies.length === 0) {
+                } else if (availableDeputies.length === 0 && source !== 'manual') {
                     alert("Nessun deputato disponibile per questo gruppo.");
                     return;
                 }
-                // --- FINE FILTRO ---
 
                 shuffleArray(availableDeputies);
-                sessionDeputies = availableDeputies.slice(0, Math.min(totalRounds, availableDeputies.length));
+                
+                if (source === 'all') {
+                    sessionDeputies = availableDeputies.slice(0, Math.min(totalRounds, availableDeputies.length));
+                } else {
+                     sessionDeputies = availableDeputies;
+                }
                 totalRounds = sessionDeputies.length;
 
                 currentQuestionIndex = 0;
                 score = 0;
+                sessionResults = [];
                 
                 setupScreen.classList.add('hidden');
                 endScreen.classList.add('hidden');
@@ -1237,13 +1733,11 @@
                     displayNextSeatQuestion();
                 } else if (currentGameMode === 'click-seat') {
                     clickSeatGameScreen.classList.remove('hidden');
-                    // Carica l'iframe. La domanda parte quando l'iframe manda 'iframeReady'
                     const currentTheme = html.getAttribute('data-theme') || 'light';
                     quizEmicicloIframe.src = `/static/emiciclo_quiz.html?theme=${currentTheme}`;
                 }
             }
             
-            // --- LOGICA MODALITÀ CLASSICA (MODIFICATA) ---
             function displayNextQuestion() {
                 if (currentQuestionIndex >= totalRounds) {
                     endSession();
@@ -1256,21 +1750,22 @@
                 correctDeputy = sessionDeputies[currentQuestionIndex];
                 deputyImage.src = correctDeputy.photo_url;
                 
-                // --- INIZIO NUOVA LOGICA OPZIONI ---
                 const correctGender = correctDeputy.gender;
                 let wrongOptionsPool;
-
-                if (sessionGroupFilter === 'Tutti') {
-                    // Regola 2 (Modalità "Tutti"): Filtra per genere, ma NON per gruppo
-                    wrongOptionsPool = allDeputies.filter(d => 
+                
+                let sourcePool = (deputySourceSelect.value === 'manual' && customDeputyList.length >= 4)
+                    ? customDeputyList
+                    : allDeputies;
+                
+                if (sessionGroupFilter === 'Tutti' || deputySourceSelect.value === 'manual') {
+                    wrongOptionsPool = sourcePool.filter(d => 
                         d.name !== correctDeputy.name && 
-                        d.gender === correctGender // Regola 1 (Genere)
+                        d.gender === correctGender
                     );
                 } else {
-                    // Modalità Gruppo Specifico: Filtra per genere E per gruppo
-                    wrongOptionsPool = allDeputies.filter(d => 
+                    wrongOptionsPool = sourcePool.filter(d => 
                         d.name !== correctDeputy.name && 
-                        d.gender === correctGender && // Regola 1 (Genere)
+                        d.gender === correctGender &&
                         d.simple_group === sessionGroupFilter
                     );
                 }
@@ -1278,12 +1773,9 @@
                 shuffleArray(wrongOptionsPool);
                 let wrongOptions = wrongOptionsPool.slice(0, 3);
 
-                // Fallback 1: Se non ci sono abbastanza opzioni (es. gruppo con 1 sola donna)
-                // cerca nello stesso genere, ma in QUALSIASI gruppo.
                 if (wrongOptions.length < 3) {
                     let needed = 3 - wrongOptions.length;
                     const existingNames = [correctDeputy.name, ...wrongOptions.map(d => d.name)];
-                    
                     let fallbackPool1 = allDeputies.filter(d => 
                         !existingNames.includes(d.name) &&
                         d.gender === correctGender
@@ -1292,8 +1784,6 @@
                     wrongOptions = [...wrongOptions, ...fallbackPool1.slice(0, needed)];
                 }
                 
-                // Fallback 2: Se ANCORA non ci sono abbastanza opzioni (es. solo 2 deputati di quel genere in totale)
-                // prendi qualsiasi altro deputato per riempire.
                 if (wrongOptions.length < 3) {
                      let needed = 3 - wrongOptions.length;
                      const existingNames = [correctDeputy.name, ...wrongOptions.map(d => d.name)];
@@ -1301,7 +1791,6 @@
                      shuffleArray(fallbackPool2);
                      wrongOptions = [...wrongOptions, ...fallbackPool2.slice(0, needed)];
                 }
-                // --- FINE NUOVA LOGICA OPZIONI ---
 
                 const options = [correctDeputy, ...wrongOptions];
                 shuffleArray(options);
@@ -1310,11 +1799,7 @@
                 options.forEach(option => {
                     const button = document.createElement('button');
                     button.className = 'answer-btn';
-                    
-                    // --- MODIFICA QUI ---
-                    // Mostra il nome (COGNOME Nome) e il gruppo COMPLETO
                     button.innerHTML = `<span class="name">${option.name}</span><span class="group">${option.group}</span>`;
-                    
                     button.onclick = () => handleAnswer(option.name === correctDeputy.name, button);
                     answersContainer.appendChild(button);
                 });
@@ -1322,6 +1807,9 @@
 
             function handleAnswer(isCorrect, clickedButton) {
                 document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
+                
+                sessionResults.push({ deputy: correctDeputy, correct: isCorrect });
+                
                 if (isCorrect) {
                     score++;
                     clickedButton.classList.add('correct');
@@ -1341,10 +1829,8 @@
                 currentQuestionIndex++;
                 nextQuestionTimeout = setTimeout(displayNextQuestion, 2000);
             }
-            // --- FINE LOGICA MODALITÀ CLASSICA ---
             
             
-            // --- LOGICA MODALITÀ MANUALE ---
             function displayNextManualQuestion() {
                 if (currentQuestionIndex >= totalRounds) {
                     endSession();
@@ -1358,7 +1844,8 @@
                 manualFeedbackText.className = 'feedback-text';
                 hintsDisplayArea.innerHTML = '';
                 hintsDisplayArea.classList.add('hidden');
-                if (sessionGroupFilter === 'Tutti') {
+                
+                if (sessionGroupFilter === 'Tutti' || deputySourceSelect.value === 'manual') {
                     groupGuessWrapper.classList.remove('hidden');
                     groupGuessSelect.value = ''; 
                 } else {
@@ -1383,24 +1870,28 @@
                                           .toLowerCase()
                                           .replace(/[^a-z0-9]/g, ' '); 
                 
-                // Usa il nome completo per il check
                 const normalizedGuessName = normalize(guessName);
-                const normalizedCorrectName = normalize(correctDeputy.name.split('(')[0]); // Normalizza solo il nome
+                const normalizedCorrectName = normalize(correctDeputy.name.split('(')[0]);
                 
                 const isNameCorrect = normalizedGuessName.length > 2 && normalizedCorrectName.includes(normalizedGuessName);
                 const isGroupCorrect = guessGroup === correctGroup;
-                const fullAnswer = `${correctDeputy.name} (${correctDeputy.group})`; // Mostra nome e gruppo completo
+                const fullAnswer = `${correctDeputy.name} (${correctDeputy.group})`;
+                
                 let roundCorrect = false;
-                if (sessionGroupFilter !== 'Tutti') {
+                if (sessionGroupFilter !== 'Tutti' && deputySourceSelect.value !== 'manual') {
                     if (isNameCorrect) roundCorrect = true;
                 } else {
                     if (isNameCorrect && isGroupCorrect) roundCorrect = true;
                 }
+                
+                sessionResults.push({ deputy: correctDeputy, correct: roundCorrect });
+                
                 submitManualAnswerBtn.disabled = true;
                 lastnameInput.disabled = true;
                 groupGuessSelect.disabled = true;
                 hintGroupBtn.disabled = true;
                 hintInitialBtn.disabled = true;
+                
                 if (roundCorrect) {
                     score++;
                     manualFeedbackText.textContent = `✓ Corretto! Era ${fullAnswer}`;
@@ -1428,10 +1919,8 @@
                 hintsDisplayArea.classList.remove('hidden');
                 hintInitialBtn.disabled = true;
             }
-            // --- FINE LOGICA MODALITÀ MANUALE ---
             
             
-            // --- LOGICA MODALITÀ SEGGIO (SCRITTO) ---
             function displayNextSeatQuestion() {
                 if (currentQuestionIndex >= totalRounds) {
                     endSession();
@@ -1452,11 +1941,14 @@
             function handleSeatAnswer() {
                 const guessSeat = seatInput.value.trim();
                 const correctSeat = correctDeputy.seat;
+                const isCorrect = (guessSeat === correctSeat);
 
+                sessionResults.push({ deputy: correctDeputy, correct: isCorrect });
+                
                 submitSeatAnswerBtn.disabled = true;
                 seatInput.disabled = true;
 
-                if (guessSeat === correctSeat) {
+                if (isCorrect) {
                     score++;
                     seatFeedbackText.textContent = `✓ Corretto! È il seggio ${correctSeat}.`;
                     seatFeedbackText.className = 'feedback-text correct';
@@ -1474,13 +1966,10 @@
                 seatGameScreen.classList.add('hidden');
                 setupScreen.classList.remove('hidden');
             }
-            // --- FINE LOGICA MODALITÀ SEGGIO (SCRITTO) ---
             
-            
-            // --- NUOVA LOGICA MODALITÀ "CLICCA SEGGIO" ---
             
             function displayNextClickSeatQuestion() {
-                if (!iframeReady) return; // Aspetta che l'iframe sia pronto
+                if (!iframeReady) return;
                 if (currentQuestionIndex >= totalRounds) {
                     endSession();
                     return;
@@ -1492,7 +1981,6 @@
                 clickSeatFeedbackText.textContent = '';
                 clickSeatFeedbackText.className = 'feedback-text';
 
-                // Resetta l'iframe
                 if (quizEmicicloIframe.contentWindow) {
                     quizEmicicloIframe.contentWindow.postMessage({ type: 'reset' }, '*');
                 }
@@ -1500,8 +1988,10 @@
             
             function handleIframeAnswer(guessedSeat) {
                 const correctSeat = correctDeputy.seat;
+                const isCorrect = (guessedSeat === correctSeat);
+
+                sessionResults.push({ deputy: correctDeputy, correct: isCorrect });
                 
-                // Manda le info all'iframe per colorare i seggi
                 if (quizEmicicloIframe.contentWindow) {
                     quizEmicicloIframe.contentWindow.postMessage({ 
                         type: 'showAnswer', 
@@ -1510,7 +2000,7 @@
                     }, '*');
                 }
 
-                if (guessedSeat === correctSeat) {
+                if (isCorrect) {
                     score++;
                     clickSeatFeedbackText.textContent = `✓ Corretto! È il seggio ${correctSeat}.`;
                     clickSeatFeedbackText.className = 'feedback-text correct';
@@ -1527,30 +2017,39 @@
             function quitClickSeatGame() {
                  if (nextQuestionTimeout) clearTimeout(nextQuestionTimeout);
                 clickSeatGameScreen.classList.add('hidden');
-                quizEmicicloIframe.src = 'about:blank'; // Scarica l'iframe
+                quizEmicicloIframe.src = 'about:blank';
                 iframeReady = false;
                 setupScreen.classList.remove('hidden');
             }
             
-            // Listener per i messaggi dall'iframe
             window.addEventListener('message', (event) => {
-                // Filtra i messaggi per assicurarsi che provengano dall'iframe giusto
-                if (event.source !== quizEmicicloIframe.contentWindow) return;
-
                 const data = event.data;
-                if (data.type === 'seatClick') {
-                    handleIframeAnswer(data.seat);
+                
+                if (event.source === quizEmicicloIframe.contentWindow) {
+                    if (data.type === 'seatClick') {
+                        handleIframeAnswer(data.seat);
+                    }
+                    if (data.type === 'iframeReady') {
+                        iframeReady = true;
+                        displayNextClickSeatQuestion();
+                    }
                 }
                 
-                if (data.type === 'iframeReady') {
-                    iframeReady = true;
-                    displayNextClickSeatQuestion(); // L'iframe è pronto, fai partire la prima domanda
+                if (event.source === emicicloViewIframe.contentWindow) {
+                    if (data.type === 'mapSeatClick') {
+                        const seatNumber = data.seat;
+                        const deputy = allDeputies.find(d => d.seat === seatNumber);
+                        
+                        if (deputy) {
+                            showDeputyDetails(deputy);
+                        } else {
+                            console.log('Seggio vuoto:', seatNumber);
+                        }
+                    }
                 }
             });
-            // --- FINE NUOVA LOGICA ---
             
             
-            // --- LOGICA SCHERMATA RICERCA ---
             function showSearchScreen() {
                 setupScreen.classList.add('hidden');
                 searchScreen.classList.remove('hidden');
@@ -1570,18 +2069,13 @@
                 searchResultsContainer.innerHTML = ''; 
                 
                 const filteredDeputies = allDeputies.filter(deputy => {
-                    // --- MODIFICA QUI ---
-                    // Usa il nome completo per i filtri di nome/cognome
                     const nameParts = deputy.name.toLowerCase().split('(')[0].trim().split(' ');
                     const cognome = nameParts[0];
                     const nome = nameParts.slice(1).join(' ');
                     
                     const matchCognome = cognome.startsWith(cognomeFilter);
                     const matchNome = nome.startsWith(nomeFilter);
-                    
-                    // Usa il simple_group per il filtro gruppo
                     const matchGruppo = (gruppoFilter === 'Tutti') || (deputy.simple_group === gruppoFilter);
-                    
                     const matchCommittee = (committeeFilter === 'Tutte') || (deputy.committees.includes(committeeFilter));
                     
                     return matchCognome && matchNome && matchGruppo && matchCommittee;
@@ -1595,9 +2089,6 @@
                 filteredDeputies.forEach(deputy => {
                     const item = document.createElement('div');
                     item.className = 'search-result-item';
-                    
-                    // --- MODIFICA QUI ---
-                    // Mostra il nome (name) e il gruppo (group) completi
                     item.innerHTML = `
                         <img src="${deputy.photo_url}" class="result-thumb" alt="${deputy.name}">
                         <div class="result-info">
@@ -1612,8 +2103,8 @@
             
             function showDeputyDetails(deputy) {
                 modalImage.src = deputy.photo_url;
-                modalName.textContent = deputy.name; // Mostra nome completo
-                modalGroup.textContent = deputy.group; // Mostra gruppo completo
+                modalName.textContent = deputy.name;
+                modalGroup.textContent = deputy.group;
                 
                 modalConstituency.textContent = `Circoscrizione: ${deputy.constituency || 'N/D'}`;
                 const genderText = deputy.gender === 'male' ? 'Uomo' : (deputy.gender === 'female' ? 'Donna' : 'N/D');
@@ -1623,7 +2114,8 @@
                     modalSeat.textContent = `Seggio n. ${deputy.seat}`;
                     modalSeat.classList.remove('hidden');
                     
-                    modalEmiciclo.src = `/static/emiciclo.html?highlight=${deputy.seat}`;
+                    const currentTheme = html.getAttribute('data-theme') || 'light';
+                    modalEmiciclo.src = `/static/emiciclo.html?highlight=${deputy.seat}&theme=${currentTheme}`;
                     modalEmiciclo.classList.remove('hidden');
                 } else {
                     modalSeat.textContent = 'Seggio: N/D';
@@ -1651,21 +2143,67 @@
                 modalEmiciclo.src = 'about:blank'; 
             }
             
-            // --- FINE LOGICA RICERCA ---
             
-            // --- ENDSESSION MODIFICATO ---
+            function showEmicicloMap() {
+                const currentTheme = html.getAttribute('data-theme') || 'light';
+                emicicloViewIframe.src = `/static/emiciclo_map.html?theme=${currentTheme}`;
+                emicicloViewOverlay.classList.remove('hidden');
+            }
+            
+            function hideEmicicloMap() {
+                emicicloViewOverlay.classList.add('fade-out');
+                setTimeout(() => {
+                    emicicloViewOverlay.classList.add('hidden');
+                    emicicloViewOverlay.classList.remove('fade-out');
+                    emicicloViewIframe.src = 'about:blank';
+                }, 200); 
+            }
+            
+            
             function endSession() {
                 gameScreen.classList.add('hidden');
                 manualGameScreen.classList.add('hidden'); 
                 seatGameScreen.classList.add('hidden'); 
-                clickSeatGameScreen.classList.add('hidden'); // NUOVO
+                clickSeatGameScreen.classList.add('hidden');
                 endScreen.classList.remove('hidden');
                 finalScoreText.textContent = `${score} / ${totalRounds}`;
+                
+                renderEndGameSummary();
+            }
+            
+            function renderEndGameSummary() {
+                resultsSummaryContainer.innerHTML = '';
+                
+                if (sessionResults.length === 0) return;
+                
+                sessionResults.forEach(result => {
+                    const item = document.createElement('div');
+                    item.className = 'result-summary-item';
+
+                    const nameParts = result.deputy.name.split(' ');
+                    const lastName = nameParts[0].toUpperCase();
+                    const firstName = nameParts.slice(1).join(' ');
+                    const formattedName = `${lastName} ${firstName}`;
+                    
+                    const iconClass = result.correct ? 'correct' : 'incorrect';
+                    const icon = result.correct ? '✓' : '✗';
+
+                    item.innerHTML = `
+                        <img src="${result.deputy.photo_url}" class="result-summary-thumb" alt="${result.deputy.name}">
+                        <div class="result-summary-info">
+                            <div class="name">${formattedName}</div>
+                            <div class="group">${result.deputy.group}</div>
+                        </div>
+                        <div class="result-summary-icon ${iconClass}">${icon}</div>
+                    `;
+                    resultsSummaryContainer.appendChild(item);
+                });
             }
 
             function restartTraining() {
                 endScreen.classList.add('hidden');
                 setupScreen.classList.remove('hidden');
+                toggleDeputySourceControls(); 
             }
             
             function quitGame() {
@@ -1680,7 +2218,6 @@
                 setupScreen.classList.remove('hidden');
             }
             
-            // --- UPDATEHEADER MODIFICATO ---
             function updateGameHeader() {
                 const progress = `Domanda ${currentQuestionIndex + 1} / ${totalRounds}`;
                 const scoreTextContent = `Punteggio: ${score}`;
@@ -1710,10 +2247,8 @@
             startBtn.addEventListener('click', startTraining);
             restartBtn.addEventListener('click', restartTraining);
             
-            // Listener Modalità Classica
             quitBtn.addEventListener('click', quitGame);
             
-            // Listener Modalità Manuale
             manualQuitBtn.addEventListener('click', quitManualGame);
             submitManualAnswerBtn.addEventListener('click', handleManualAnswer);
             hintGroupBtn.addEventListener('click', handleHintGroup);
@@ -1727,7 +2262,6 @@
                 }
             });
             
-            // Listener Modalità Seggio (Scritto)
             seatQuitBtn.addEventListener('click', quitSeatGame);
             submitSeatAnswerBtn.addEventListener('click', handleSeatAnswer);
             seatInput.addEventListener('keydown', (event) => {
@@ -1739,10 +2273,8 @@
                 }
             });
             
-            // Listener Modalità Click-Seggio (NUOVI)
             clickSeatQuitBtn.addEventListener('click', quitClickSeatGame);
             
-            // Listener Ricerca
             searchBtn.addEventListener('click', showSearchScreen);
             searchBackBtn.addEventListener('click', hideSearchScreen);
             searchCognomeInput.addEventListener('input', renderSearchResults);
@@ -1750,18 +2282,19 @@
             searchGruppoSelect.addEventListener('change', renderSearchResults);
             searchCommitteeSelect.addEventListener('change', renderSearchResults);
             
-            // Listener Modale
             modalCloseBtn.addEventListener('click', hideModal);
             modalOverlay.addEventListener('click', (event) => {
                 if (event.target === modalOverlay) {
                     hideModal();
                 }
             });
+            
+            viewEmicicloBtn.addEventListener('click', showEmicicloMap);
+            emicicloViewCloseBtn.addEventListener('click', hideEmicicloMap);
 
 
             initialize();
             
-            // PWA Service Worker Registration
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('/service-worker.js')

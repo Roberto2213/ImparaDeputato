@@ -1,3 +1,13 @@
+:root {
+    --seat-empty-bg: #e0e0e0;
+    --seat-empty-border: #c0c0c0;
+}
+
+[data-theme="dark"] {
+    --seat-empty-bg: #334155;
+    --seat-empty-border: #475569;
+}
+
 body{ 
 	margin:0;
 	padding:0;
@@ -14,34 +24,35 @@ body{
 #emiciclo{ 
 	position:relative;
 }
-#emiciclo .circle{
-	padding:2px;
-	width:2px;
-	height:2px;
-	-webkit-border-radius:50%;
-	-moz-border-radius:50%;
-	border-radius:50%;
-	background-color:#000; 
-	color:#000!important; 
-	border:solid 1px #666;
-	font-size:1px;
-	line-height:2px;
-	text-decoration:none;	
+
+/* --- NUOVO STILE BASE (Dimensioni corrette) --- */
+#emiciclo .circle, #emiciclo .true {
+    width: 8px; /* Ridotto da 10px */
+    height: 6px; /* Ridotto da 12px */
+    padding: 0;
+    -webkit-border-radius: 2px; /* Ridotto da 3px */
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    background-color: #000; /* Colore base, verrà sovrascritto */
+    color: transparent !important; /* Nasconde il numero */
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* Ombra più piccola */
+    font-size: 1px;
+    line-height: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease-out;
 }
-#emiciclo .true{
-	padding:2px;
-	width:2px;
-	height:2px;
-	-webkit-border-radius:50%;
-	-moz-border-radius:50%;
-	border-radius:50%;
-	background-color:#fff; 
-	color:#fff!important; 
-	border:solid 1px #ddd;
-	font-size:1px;
-	line-height:2px;
-	text-decoration:none;	
+
+/* Stile per i seggi VUOTI (.true) */
+#emiciclo .true {
+	background-color: var(--seat-empty-bg) !important; 
+	color: transparent !important; 
+	border:solid 1px var(--seat-empty-border) !important;
+    box-shadow: none;
 }
+/* --- FINE NUOVO STILE BASE --- */
+
+
 #emiciclo #aggiornamento{
 	position:absolute;
 	top:15pt;
@@ -155,12 +166,34 @@ body{
 	float:left;
 }
 
-#emiciclo .noniscritto.circle, #gruppi .noniscritto {
-	background-color:#C7C7C7!important;
-	color:#C7C7C7!important;
-}
-
 #foto_wrapper_minischeda{
 	margin:4px 3px 3px 3px;
 	padding:0;
+}
+
+/* --- STILI HOVER E HIGHLIGHT (per emiciclo.html) --- */
+
+/* Stile per l'hover (zoom ridotto per adattarsi alle nuove dimensioni) */
+#emiciclo a:hover {
+    -webkit-transform: scale(3.5) translateY(-2px); /* Zoom leggermente aumentato per compensare */
+    transform: scale(3.5) translateY(-2px);
+    z-index: 9999;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+
+/* Stile per l'evidenziazione (highlight) */
+#emiciclo a.highlighted {
+    -webkit-transform: scale(4.5); /* Zoom aumentato */
+    transform: scale(4.5);
+    z-index: 10000;
+    border: 3px solid #FFD700 !important; /* Bordo oro */
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(4.0); box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+    50% { transform: scale(4.7); box-shadow: 0 0 20px rgba(255, 215, 0, 1); }
+    100% { transform: scale(4.0); box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
 }

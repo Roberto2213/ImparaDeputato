@@ -17,11 +17,15 @@
     :root {
         --seat-empty-bg: #e0e0e0;
         --seat-empty-border: #c0c0c0;
+        --seat-number-color: #000;
+        --seat-number-empty-color: #999;
     }
     
     [data-theme="dark"] {
         --seat-empty-bg: #334155;
         --seat-empty-border: #475569;
+        --seat-number-color: #FFF;
+        --seat-number-empty-color: #777;
     }
 
     /* --- IMPOSTAZIONE BODY E HTML --- */
@@ -37,84 +41,75 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         background-color: transparent;
         padding-top: 0 !important;
-        
-        /* 1. Centra il contenitore #dove_siedono */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
+        overflow: hidden; /* 1. Nasconde lo scorrimento */
     }
 
-    /* 2. #dove_siedono è il "foglio" che viene scalato */
+    /* 2. #dove_siedono è il "foglio" che viene centrato e scalato */
     #dove_siedono { 
         min-height: 0; 
         margin: 0;
         padding: 0;
         
-        /* 3. Diamo la dimensione fissa in pt (basata su posizioni.css) */
-        width: 360pt; 
-        height: 310pt;
-
-        /* 4. Scaliamo questo foglio (scala più piccola per la modale) */
-        transform: scale(1.25); 
+        /* 3. Posiziona il "foglio" al centro e scalalo */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(2.0); /* Centra E Scala */
         transform-origin: center;
-        
-        position: relative; /* Necessario per il figlio #emiciclo */
     }
 
     #app-header, #legenda, #aggiornamento { display: none; }
     
-    /* 5. #emiciclo riempie il foglio */
+    /* 4. #emiciclo è il "contenitore relativo" con le dimensioni fisse */
     #emiciclo {
         position: relative;
-        width: 100%;
-        height: 100%;
+        width: 360pt;  /* Dimensione fissa in pt */
+        height: 310pt; /* Dimensione fissa in pt */
     }
 
-    /* --- STILI DEI SEGGI (da dove_siedono.css) --- */
+    /* --- STILI DEI SEGGI (con più separazione) --- */
     #emiciclo .circle, #emiciclo .true {
-        width: 8px;
-        height: 6px;
+        width: 8px;   /* Rimpicciolito per separazione */
+        height: 6px;  /* Rimpicciolito per separazione */
         padding: 0;
         border-radius: 2px;
         box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-        color: transparent !important;
-        font-size: 1px;
-        line-height: 6px;
+        border: 1px solid rgba(0,0,0,0.1);
         text-decoration: none;
         transition: all 0.1s ease-out; /* Velocizzato */
-        border: 1px solid rgba(0,0,0,0.1);
+
+        /* Numeri visibili */
+        color: var(--seat-number-color) !important;
+        font-size: 5px !important; /* Adattato alla nuova altezza */
+        line-height: 6px !important; /* Adattato alla nuova altezza */
+        text-align: center;
+        font-weight: bold;
+        overflow: hidden;
+        cursor: pointer;
     }
 
     #emiciclo .true {
         background-color: var(--seat-empty-bg) !important;
         border: 1px solid var(--seat-empty-border) !important;
         box-shadow: none;
+        color: var(--seat-number-empty-color) !important;
+        cursor: default;
     }
     
-    /* Stile per l'hover (con animazione veloce) */
-    #emiciclo a:hover {
-        -webkit-transform: scale(3.5) translateY(-2px);
-        transform: scale(3.5) translateY(-2px);
+    #emiciclo a:not(.true):hover {
+        -webkit-transform: scale(3.0) translateY(-2px);
+        transform: scale(3.0) translateY(-2px);
         z-index: 9999;
         border: 2px solid #ffffff !important;
         box-shadow: 0 5px 15px rgba(0,0,0,0.4);
     }
     
-    /* Stile per l'evidenziazione (highlight) */
     #emiciclo a.highlighted {
-        -webkit-transform: scale(4.5);
-        transform: scale(4.5);
+        -webkit-transform: scale(4.0);
+        transform: scale(4.0);
         z-index: 10000;
         border: 3px solid #FFD700 !important;
         box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-        animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-        0% { transform: scale(4.0); box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
-        50% { transform: scale(4.7); box-shadow: 0 0 20px rgba(255, 215, 0, 1); }
-        100% { transform: scale(4.0); box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
     }
 </style>
 </head>
@@ -2113,29 +2108,36 @@
       Questo script cerca un parametro "?highlight=NUMERO" nell'URL
       e applica la classe '.highlighted' al seggio corrispondente.
     -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                const params = new URLSearchParams(window.location.search);
-                const seggioId = params.get('highlight');
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const emiciclo = document.getElementById('emiciclo');
+        const html = document.documentElement;
 
-                if (seggioId) {
-                    const seggio = document.getElementById('seggio_' + seggioId);
-                    if (seggio) {
-                        seggio.classList.add('highlighted');
-                        
-                        // Centra la visuale sul seggio evidenziato
-                        seggio.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center',
-                            inline: 'center'
-                        });
-                    }
-                }
-            } catch (e) {
-                console.error('Errore nello script di evidenziazione:', e);
+        // Applica il tema scuro/chiaro
+        const params = new URLSearchParams(window.location.search);
+        const theme = params.get('theme') || 'light';
+        html.setAttribute('data-theme', theme);
+        
+        // Logica Click
+        emiciclo.addEventListener('click', function(e) {
+            const seatElement = e.target.closest('a[id^="seggio_"]');
+            
+            // Controlla che sia un seggio valido e non uno vuoto (.true)
+            if (seatElement && !seatElement.classList.contains('true')) {
+                const seatId = seatElement.id.split('_')[1];
+                // Manda un messaggio al genitore (training.html)
+                window.parent.postMessage({ type: 'mapSeatClick', seat: seatId }, '*');
             }
         });
-    </script>
+
+        // Ascolta i cambi di tema dal genitore
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            if (data.type === 'setTheme') {
+                 html.setAttribute('data-theme', data.theme);
+            }
+        });
+    });
+</script>
 </body>
 </html>
