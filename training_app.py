@@ -1,6 +1,7 @@
 import json
 import os
-from flask import Flask, render_template, jsonify, send_from_directory
+# --- MODIFICA 1: Aggiungi 'make_response' ---
+from flask import Flask, render_template, jsonify, send_from_directory, make_response
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -11,7 +12,6 @@ COMMITTEE_FILTER_LIST = []
 def load_data_from_cache():
     """
     Carica i dati pre-elaborati dal file JSON di cache.
-    Molto più veloce rispetto al parsing dei CSV/RDF ad ogni avvio.
     """
     global DEPUTIES_DATA, COMMITTEE_FILTER_LIST
     
@@ -31,8 +31,10 @@ def load_data_from_cache():
         print(f"Errore durante il caricamento della cache: {e}")
 
 def get_all_groups(deputies_list):
+    """
+    Estrae l'elenco unico dei gruppi.
+    """
     if not deputies_list: return []
-    # Filtra solo i gruppi validi (opzionale, ma pulisce la lista)
     groups = set(d['simple_group'] for d in deputies_list if d['simple_group'])
     return sorted(list(groups))
 
@@ -45,9 +47,21 @@ load_data_from_cache()
 def index():
     return render_template('training.html')
 
+# --- MODIFICA 2: Aggiorna questa funzione ---
 @app.route('/service-worker.js')
 def service_worker():
-    return send_from_directory('.', 'service-worker.js')
+    """
+    Serve il service worker con header che VIETANO il caching.
+    Questo forza il browser a controllare sempre se c'è una nuova versione.
+    """
+    # Crea una risposta in modo da poter modificare gli header
+    response = make_response(send_from_directory('.', 'service-worker.js'))
+    
+    # Forza il browser a non mettere MAI in cache questo specifico file.
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route('/api/deputies')
 def get_deputies():
