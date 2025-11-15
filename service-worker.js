@@ -1,32 +1,34 @@
-// 1. CAMBIA IL NOME DELLA CACHE! (es. da v1 a v2)
-const CACHE_NAME = 'allenamento-deputati-v3';
+// 1. CAMBIA IL NOME DELLA CACHE OGNI VOLTA CHE AGGIORNI!
+const CACHE_NAME = 'allenamento-deputati-v4';
 
 // 2. AGGIUNGI TUTTI I FILE DELL'APP SHELL
 const URLS_TO_CACHE = [
   '/', // La pagina principale (training.html)
   
-  // Pagine HTML dell'emiciclo
-  '/static/emiciclo.html', // <-- AGGIUNTO
-  '/static/emiciclo_quiz.html', // <-- AGGIUNTO
+  // ---> INIZIO MODIFICA: File principali aggiunti
+  '/static/training_styles.css',
+  '/static/training_logic.js',
+  // <--- FINE MODIFICA
   
-  // CSS necessari (visti in emiciclo.html)
-  '/static/dove_siedono.css', // <-- AGGIUNTO
-  '/static/posizioni.css', // <-- AGGIUNTO
-  '/static/gruppi.css', // <-- AGGIUNTO
-  '/static/componenti.css', // <-- AGGIUNTO
+  // Pagine HTML dell'emiciclo
+  '/static/emiciclo.html',
+  '/static/emiciclo_quiz.html',
+  
+  // CSS necessari
+  '/static/dove_siedono.css',
+  '/static/posizioni.css',
+  '/static/gruppi.css',
+  '/static/componenti.css',
 
-  // Manifest e icone (buona pratica)
-  '/static/manifest.json', // Già presente nel file originale
-  '/static/icons/icon-192x192.png', // <-- AGGIUNTO (dal manifest.json)
-  '/static/icons/icon-512x512.png'  // <-- AGGIUNTO (dal manifest.json)
+  // Manifest e icone
+  '/static/manifest.json',
+  '/static/icons/icon-192x192.png',
+  '/static/icons/icon-512x512.png',
 
-  /*
-  Considera di aggiungere anche i file audio se sono cruciali per l'esperienza offline:
+  // File Audio
   '/static/audio/correct.wav',
   '/static/audio/incorrect.wav',
-  '/static/audio/buzzer_blu.wav',
-  ... etc.
-  */
+  '/static/audio/round_start.wav'
 ];
 
 // 1. Evento "install"
@@ -34,18 +36,17 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Cache aperta');
+        console.log('Cache aperta:', CACHE_NAME);
         return cache.addAll(URLS_TO_CACHE);
       })
   );
   
-  // <-- AGGIUNGI QUESTA RIGA
   // Forza il service worker a passare dallo stato "waiting" ad "active"
   self.skipWaiting();
 });
 
 
-// 2. Evento "fetch": si attiva ogni volta che la pagina fa una richiesta di rete (es. per un'immagine, un file API, etc.).
+// 2. Evento "fetch": si attiva ogni volta che la pagina fa una richiesta di rete
 self.addEventListener('fetch', event => {
   event.respondWith(
     // Prova a trovare la risorsa nella cache.
@@ -61,8 +62,12 @@ self.addEventListener('fetch', event => {
           networkResponse => {
             // Se la richiesta ha successo, mettiamola in cache per il futuro.
             // Controlliamo che la risposta sia valida prima di metterla in cache.
-            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic' && !networkResponse.type === 'cors') {
-                 // Non mettiamo in cache le risposte non valide o le richieste a terze parti senza CORS
+            if (!networkResponse || networkResponse.status !== 200) {
+                 return networkResponse;
+            }
+            
+            // Gestione speciale per le foto, ma va bene anche per altri
+             if (networkResponse.type !== 'basic' && !networkResponse.type === 'cors') {
                  if (event.request.url.startsWith('https://documenti.camera.it')) {
                      // Gestiamo le foto dei deputati
                      return caches.open(CACHE_NAME).then(cache => {
@@ -78,6 +83,7 @@ self.addEventListener('fetch', event => {
 
             caches.open(CACHE_NAME)
               .then(cache => {
+                // Metti in cache la nuova risorsa (JS, CSS, API, FOTO, ecc.)
                 cache.put(event.request, responseToCache);
               });
 
@@ -91,18 +97,19 @@ self.addEventListener('fetch', event => {
 
 // 3. Evento "activate"
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
+  const cacheWhitelist = [CACHE_NAME]; // Solo la nuova cache 'v4' è permessa
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
+          // Se il nome della cache NON è nella whitelist (è una vecchia cache 'v3')
           if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
+            console.log('Cancellazione vecchia cache:', cacheName);
+            return caches.delete(cacheName); // Cancellala
           }
         })
       );
     }).then(() => {
-      // <-- AGGIUNGI QUESTA RIGA
       // Prende il controllo immediato di tutte le pagine aperte
       return self.clients.claim();
     })
