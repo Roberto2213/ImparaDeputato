@@ -1,11 +1,11 @@
 {
-  "name": "Allenamento Deputati",
+  "name": "Impara Deputato",
   "short_name": "Deputati",
-  "description": "Un'app per allenarsi a riconoscere i deputati italiani.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#6366f1",
+  "theme_color": "#0055A5",
+  "description": "Impara a riconoscere i deputati e la loro posizione.",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -16,8 +16,7 @@
     {
       "src": "/static/icons/icon-512x512.png",
       "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
+      "sizes": "512x512"
     }
   ]
 }

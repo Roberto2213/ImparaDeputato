@@ -1,34 +1,37 @@
 // 1. CAMBIA IL NOME DELLA CACHE OGNI VOLTA CHE AGGIORNI!
-const CACHE_NAME = 'allenamento-deputati-v4';
+const CACHE_NAME = 'allenamento-deputati-v5';
 
 // 2. AGGIUNGI TUTTI I FILE DELL'APP SHELL
 const URLS_TO_CACHE = [
-  '/', // La pagina principale (training.html)
+  '/', 
   
-  // ---> INIZIO MODIFICA: File principali aggiunti
-  '/static/training_styles.css',
+  // LOGICA E DATI (Fondamentale: aggiunto seggi.json)
   '/static/training_logic.js',
-  // <--- FINE MODIFICA
-  
-  // Pagine HTML dell'emiciclo
-  '/static/emiciclo.html',
-  '/static/emiciclo_quiz.html',
-  
-  // CSS necessari
+  '/static/seggi.json', 
+
+  // CSS
+  '/static/training_styles.css',
   '/static/dove_siedono.css',
   '/static/posizioni.css',
   '/static/gruppi.css',
   '/static/componenti.css',
+
+  // HTML Aggiuntivi
+  '/static/emiciclo.html',
+  '/static/emiciclo_quiz.html',
+  '/static/emiciclo_map.html', // Aggiunto per sicurezza
 
   // Manifest e icone
   '/static/manifest.json',
   '/static/icons/icon-192x192.png',
   '/static/icons/icon-512x512.png',
 
-  // File Audio
+  // Audio (Aggiunti i buzzer che mancavano)
   '/static/audio/correct.wav',
   '/static/audio/incorrect.wav',
-  '/static/audio/round_start.wav'
+  '/static/audio/round_start.wav',
+  '/static/audio/buzzer_blu.wav',
+  '/static/audio/buzzer_verde.wav'
 ];
 
 // 1. Evento "install"

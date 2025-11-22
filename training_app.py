@@ -80,6 +80,11 @@ def get_committees():
 def mappa_moderna():
     return render_template('emiciclo_moderno.html')
 
+# AGGIUNGI QUESTA ROTTA PER IL MANIFEST (Opzionale ma consigliato)
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('static', 'manifest.json')
+
 if __name__ == '__main__':
     if not DEPUTIES_DATA:
         print("\nATTENZIONE: Nessun dato caricato. L'app potrebbe non funzionare correttamente.")
