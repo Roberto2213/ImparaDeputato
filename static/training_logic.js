@@ -436,7 +436,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (currentGameMode === 'click-seat') {
             clickSeatGameScreen.classList.remove('hidden');
             const currentTheme = html.getAttribute('data-theme') || 'light';
-            quizEmicicloIframe.src = `/static/emiciclo_quiz.html?theme=${currentTheme}`;
+            // NUOVO CODICE: Usa emiciclo_universale in modalità quiz
+            quizEmicicloIframe.src = `/emiciclo?mode=quiz&theme=${currentTheme}`;
         }
     }
     
@@ -748,15 +749,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        if (event.source === emicicloViewIframe.contentWindow) {
+       if (event.source === emicicloViewIframe.contentWindow) {
             if (data.type === 'mapSeatClick') {
                 const seatNumber = data.seat;
-                const deputy = allDeputies.find(d => d.seat === seatNumber);
+                console.log('Click ricevuto dal seggio:', seatNumber);
+                
+                // MODIFICA IMPORTANTE: Confronto robusto (converte entrambi in stringa)
+                const deputy = allDeputies.find(d => String(d.seat) === String(seatNumber));
                 
                 if (deputy) {
+                    console.log('Deputato trovato:', deputy.name);
                     showDeputyDetails(deputy);
                 } else {
-                    console.log('Seggio vuoto:', seatNumber);
+                    console.log('Nessun deputato trovato per il seggio', seatNumber);
+                    // Opzionale: Mostra un alert se il seggio è vacante
+                    // alert('Seggio Vacante');
                 }
             }
         }
@@ -833,12 +840,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const genderText = deputy.gender === 'male' ? 'Uomo' : (deputy.gender === 'female' ? 'Donna' : 'N/D');
         modalGender.textContent = `Genere: ${genderText}`;
         
-        if (deputy.seat && deputy.seat !== 'N/D') {
+       if (deputy.seat && deputy.seat !== 'N/D') {
             modalSeat.textContent = `Seggio n. ${deputy.seat}`;
             modalSeat.classList.remove('hidden');
             
+            // NUOVO CODICE: Usa emiciclo_universale in modalità embed
             const currentTheme = html.getAttribute('data-theme') || 'light';
-            modalEmiciclo.src = `/static/emiciclo.html?highlight=${deputy.seat}&theme=${currentTheme}`;
+            modalEmiciclo.src = `/emiciclo?mode=embed&highlight=${deputy.seat}&theme=${currentTheme}`;
             modalEmiciclo.classList.remove('hidden');
         } else {
             modalSeat.textContent = 'Seggio: N/D';
@@ -867,9 +875,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     
-    function showEmicicloMap() {
+   function showEmicicloMap() {
         const currentTheme = html.getAttribute('data-theme') || 'light';
-        emicicloViewIframe.src = `/static/emiciclo_map.html?theme=${currentTheme}`;
+        // NUOVO CODICE: Usa emiciclo_universale in modalità default
+        emicicloViewIframe.src = `/emiciclo?mode=default&theme=${currentTheme}`;
+        
+        // Nascondi la vecchia legenda HTML statica, perché la nuova mappa ha la sua
+        const oldLegend = document.getElementById('emiciclo-view-legend');
+        if(oldLegend) oldLegend.style.display = 'none';
+        
         emicicloViewOverlay.classList.remove('hidden');
     }
     

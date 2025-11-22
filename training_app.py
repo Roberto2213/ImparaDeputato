@@ -76,6 +76,10 @@ def get_groups():
 def get_committees():
     return jsonify(['Tutte'] + COMMITTEE_FILTER_LIST)
 
+@app.route('/emiciclo')
+def mappa_moderna():
+    return render_template('emiciclo_moderno.html')
+
 if __name__ == '__main__':
     if not DEPUTIES_DATA:
         print("\nATTENZIONE: Nessun dato caricato. L'app potrebbe non funzionare correttamente.")

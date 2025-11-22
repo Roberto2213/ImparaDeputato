@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Emiciclo Universale</title>
+    <script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #222; 
+            --panel-bg: #ffffff;
+            --stroke-color: rgba(0,0,0,0.2);
+            
+            /* Colori Vivaci */
+            --c-fdi: #0b3b6a; --c-lega: #008f2b; --c-fi: #00bfff;
+            --c-pd: #d62618; --c-m5s: #f0c400; --c-avs: #a0c02e;
+            --c-iv: #d953c9; --c-azione: #003b78; --c-nm: #287ab3;
+            --c-misto: #adb5bd; --c-vuoto: #e9ecef;
+            
+            /* Stati Quiz */
+            --quiz-wrong: #ff4d4d;
+            --quiz-correct: #2ecc71;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1e293b;
+            --text-color: #f1f5f9;
+            --stroke-color: rgba(255,255,255,0.2);
+            --c-vuoto: #334155;
+        }
+
+        /* --- MODALITÀ QUIZ --- */
+        body.quiz-mode {
+            --c-fdi: #ccc; --c-lega: #ccc; --c-fi: #ccc;
+            --c-pd: #ccc; --c-m5s: #ccc; --c-avs: #ccc;
+            --c-iv: #ccc; --c-azione: #ccc; --c-nm: #ccc;
+            --c-misto: #ccc; 
+        }
+        body.quiz-mode .seat-group.quiz-correct .seat-circle {
+            fill: var(--quiz-correct) !important;
+            stroke: #145a32 !important; stroke-width: 3px !important;
+            r: 30px !important; 
+        }
+        body.quiz-mode .seat-group.quiz-wrong .seat-circle {
+            fill: var(--quiz-wrong) !important;
+            stroke: #922b21 !important; stroke-width: 3px !important;
+        }
+        body.quiz-mode .seat-group.active .seat-circle {
+             fill: #666 !important; 
+             stroke: #000 !important;
+        }
+
+        /* --- MODALITÀ EMBED --- */
+        body.embed-mode { background-color: transparent; }
+        body.embed-mode #map-container { padding-bottom: 0; }
+
+        body {
+            margin: 0; padding: 0; background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden; height: 100vh; width: 100vw;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+
+        #map-container {
+            width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: grab; touch-action: none;
+            padding-bottom: 60px; 
+            box-sizing: border-box;
+        }
+        #map-container:active { cursor: grabbing; }
+
+        svg { width: 100%; height: 100%; overflow: visible; }
+
+        /* --- SEGGI --- */
+        .seat-group { cursor: pointer; }
+        
+        .seat-circle { 
+            stroke: var(--stroke-color); stroke-width: 1px; 
+            transition: fill 0.2s, opacity 0.3s, r 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Testo (Numero) */
+        .seat-text {
+            font-size: 16px; 
+            font-weight: 800; font-family: 'Arial Black', sans-serif;
+            text-anchor: middle; dominant-baseline: central;
+            fill: white; pointer-events: none;
+            text-shadow: 0px 0px 3px rgba(0,0,0,0.8); 
+            transition: font-size 0.3s;
+        }
+
+        /* Hover */
+        .seat-group:hover .seat-circle, .seat-group.active .seat-circle {
+            stroke: #333; stroke-width: 4px;
+            r: 28px;
+        }
+
+        /* Filtro Legenda */
+        .seat-group.dimmed { opacity: 0.1; filter: grayscale(100%); }
+
+        /* --- HIGHLIGHT SUPER GIGANTE (Pop-Out Estremo) --- */
+        .seat-group.highlighted .seat-circle {
+            stroke: #FF0000; 
+            stroke-width: 8px;
+            fill: var(--c-m5s) !important; 
+            opacity: 1 !important;
+            /* Rimuoviamo il raggio fisso qui, lo gestiamo nell'animazione */
+            animation: pop-extreme 1.5s infinite alternate;
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.5)); /* Ombra profonda */
+        }
+        
+        .seat-group.highlighted .seat-text {
+            font-size: 60px !important; /* NUMERO ENORME */
+            fill: #000 !important; 
+            text-shadow: 2px 2px 0px #fff !important;
+        }
+
+        /* Animazione: Da Gigante a Colossale */
+        @keyframes pop-extreme {
+            0% { 
+                r: 80px; /* Già enorme di base */
+                stroke: #FFD700; 
+                stroke-width: 8px;
+            }
+            100% { 
+                r: 100px; /* Diventa colossale */
+                stroke: #FF4500; /* Cambia colore bordo in rosso arancio */
+                stroke-width: 12px;
+            }
+        }
+
+        /* Classi Colori */
+        .c-FDI { fill: var(--c-fdi); } .c-LEGA { fill: var(--c-lega); }
+        .c-FI-PPE { fill: var(--c-fi); } .c-PD-IDP { fill: var(--c-pd); }
+        .c-M5S { fill: var(--c-m5s); } .c-AVS { fill: var(--c-avs); }
+        .c-IVICRE { fill: var(--c-iv); } .c-AZ-PER, .c-APERRE { fill: var(--c-azione); }
+        .c-NM-M-C { fill: var(--c-nm); } .c-Misto, .c-M-ALT, .c-M-EUR, .c-M-MIN { fill: var(--c-misto); }
+        .c-vacante, .c-true { fill: var(--c-vuoto); }
+
+        .seat-group:has(.c-M5S) .seat-text, .seat-group:has(.c-vacante) .seat-text, 
+        .seat-group:has(.c-true) .seat-text { fill: #222; text-shadow: none; }
+
+        .hidden { display: none !important; }
+
+        /* LEGENDA */
+        #legend-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--bg-color); border-top: 1px solid #ccc;
+            padding: 12px 10px; display: flex; overflow-x: auto; gap: 8px; z-index: 500;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        }
+        #legend-bar::-webkit-scrollbar { display: none; }
+
+        .legend-item {
+            display: flex; align-items: center; 
+            background: #fff; 
+            padding: 8px 14px; border-radius: 20px;
+            white-space: nowrap; font-size: 0.8rem; font-weight: 700;
+            border: 1px solid #ddd; cursor: pointer; color: #333;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] .legend-item { background: #334155; border-color: #475569; color: #fff; }
+
+        .legend-item.active { background: #222; color: #fff; border-color: #000; }
+        [data-theme="dark"] .legend-item.active { background: #fff; color: #000; }
+
+        .legend-dot { width: 14px; height: 14px; border-radius: 50%; margin-right: 8px; border: 1px solid rgba(0,0,0,0.1); }
+        
+        .legend-dot.c-FDI { background: var(--c-fdi); } .legend-dot.c-LEGA { background: var(--c-lega); }
+        .legend-dot.c-FI-PPE { background: var(--c-fi); } .legend-dot.c-PD-IDP { background: var(--c-pd); }
+        .legend-dot.c-M5S { background: var(--c-m5s); } .legend-dot.c-AVS { background: var(--c-avs); }
+        .legend-dot.c-IVICRE { background: var(--c-iv); } .legend-dot.c-AZ-PER { background: var(--c-azione); }
+        .legend-dot.c-NM-M-C { background: var(--c-nm); } .legend-dot.c-Misto { background: var(--c-misto); }
+        .legend-dot.c-vacante { background: var(--c-vuoto); }
+
+        #loading {
+            position: fixed; inset: 0; background: var(--bg-color);
+            display: flex; justify-content: center; align-items: center; z-index: 2000; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">Caricamento...</div>
+
+    <div id="map-container">
+        <div id="panzoom-element" style="width:100%; height:100%;">
+            <svg id="emiciclo-svg" xmlns="http://www.w3.org/2000/svg">
+                <g id="seats-group"></g>
+            </svg>
+        </div>
+    </div>
+
+    <div id="legend-bar" class="ui-element"></div>
+
+    <script>
+        let pz;
+        let allSeatsData = [];
+        
+        const params = new URLSearchParams(window.location.search);
+        const MODE = params.get('mode') || 'default'; 
+        const HIGHLIGHT_ID = params.get('highlight');
+        const THEME = params.get('theme') || 'light';
+
+        const GROUP_MAP = {
+            'FDI': "Fratelli d'Italia", 'LEGA': "Lega", 'FI-PPE': "Forza Italia",
+            'NM-M-C': "Noi Moderati", 'PD-IDP': "Partito Democratico", 'M5S': "Movimento 5 Stelle",
+            'AVS': "Alleanza Verdi Sinistra", 'IVICRE': "Italia Viva", 'AZ-PER': "Azione",
+            'APERRE': "Azione", 'Misto': "Misto", 'vacante': "Vacante"
+        };
+
+        document.documentElement.setAttribute('data-theme', THEME);
+        
+        if (MODE === 'quiz' || MODE === 'embed') {
+            document.getElementById('legend-bar').classList.add('hidden');
+            document.getElementById('map-container').style.paddingBottom = '0';
+            if (MODE === 'quiz') document.body.classList.add('quiz-mode');
+            if (MODE === 'embed') document.body.classList.add('embed-mode');
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch('/static/seggi.json');
+                if (!response.ok) throw new Error("HTTP Error");
+                allSeatsData = await response.json();
+                
+                renderSeats(allSeatsData);
+                if (MODE === 'default') renderLegend();
+                
+                autoCenterMap();
+                initPanzoom();
+                
+                document.getElementById('loading').style.display = 'none';
+                window.parent.postMessage({ type: 'iframeReady' }, '*');
+
+                if (HIGHLIGHT_ID) highlightSeat(HIGHLIGHT_ID);
+
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loading').innerText = "Errore dati.";
+            }
+        }
+
+        function renderSeats(seats) {
+            const svgGroup = document.getElementById('seats-group');
+            const svgNS = "http://www.w3.org/2000/svg";
+
+            seats.forEach(seat => {
+                const group = document.createElementNS(svgNS, "g");
+                group.setAttribute("transform", `translate(${seat.x}, ${seat.y})`);
+                group.setAttribute("id", "seat-group-" + seat.id);
+                group.setAttribute("class", "seat-group");
+
+                const circle = document.createElementNS(svgNS, "circle");
+                circle.setAttribute("r", "24"); 
+                circle.setAttribute("cx", 0); circle.setAttribute("cy", 0);
+                
+                let cleanGroup = seat.vacante ? 'vacante' : cleanGroupName(seat.gruppo);
+                if (!GROUP_MAP[cleanGroup]) cleanGroup = 'Misto';
+                
+                circle.setAttribute("class", "seat-circle c-" + cleanGroup);
+                group.appendChild(circle);
+
+                const text = document.createElementNS(svgNS, "text");
+                text.textContent = seat.id;
+                text.setAttribute("class", "seat-text");
+                text.setAttribute("y", "1");
+                group.appendChild(text);
+
+                group.addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    handleSeatClick(seat); 
+                });
+                
+                svgGroup.appendChild(group);
+            });
+        }
+
+        function handleSeatClick(seat) {
+            if (seat.vacante) return;
+
+            if (MODE === 'quiz') {
+                document.querySelectorAll('.seat-group.active').forEach(el => el.classList.remove('active'));
+                document.getElementById('seat-group-' + seat.id).classList.add('active');
+                window.parent.postMessage({ type: 'seatClick', seat: seat.id }, '*');
+            } 
+            else if (MODE === 'default') {
+                document.querySelectorAll('.seat-group.active').forEach(el => el.classList.remove('active'));
+                document.getElementById('seat-group-' + seat.id).classList.add('active');
+                window.parent.postMessage({ type: 'mapSeatClick', seat: seat.id }, '*');
+            }
+        }
+
+        function highlightSeat(id) {
+            setTimeout(() => {
+                const el = document.getElementById('seat-group-' + id);
+                if (el) {
+                    // Sposta in primo piano assoluto (Z-Index SVG trick)
+                    el.parentNode.appendChild(el);
+                    el.classList.add('highlighted');
+                }
+            }, 400); 
+        }
+
+        function renderLegend() {
+            const bar = document.getElementById('legend-bar');
+            bar.innerHTML = '';
+            const groupsInMap = new Set(allSeatsData.map(s => s.vacante ? 'vacante' : cleanGroupName(s.gruppo)));
+            const sortedKeys = Array.from(groupsInMap).sort((a,b) => (GROUP_MAP[a] || a).localeCompare(GROUP_MAP[b] || b));
+
+            sortedKeys.forEach(key => {
+                if(!GROUP_MAP[key] || key === 'true' || key === 'APERRE') return;
+                const div = document.createElement('div');
+                div.className = 'legend-item';
+                div.innerHTML = `<div class="legend-dot c-${key}"></div>${GROUP_MAP[key]}`;
+                
+                div.onclick = () => {
+                    const isActive = div.classList.contains('active');
+                    document.querySelectorAll('.legend-item').forEach(el => el.classList.remove('active'));
+                    document.querySelectorAll('.seat-group').forEach(el => el.classList.remove('dimmed'));
+                    
+                    if (!isActive) {
+                        div.classList.add('active');
+                        document.querySelectorAll('.seat-group').forEach(el => {
+                            const circle = el.querySelector('.seat-circle');
+                            if (!circle.classList.contains('c-' + key)) {
+                                el.classList.add('dimmed');
+                            }
+                        });
+                    }
+                };
+                bar.appendChild(div);
+            });
+        }
+
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            if (data.type === 'setTheme') document.documentElement.setAttribute('data-theme', data.theme);
+            
+            if (data.type === 'showAnswer' && MODE === 'quiz') {
+                const correctId = data.correct;
+                const guessedId = data.guessed;
+                document.querySelectorAll('.seat-group.active').forEach(el => el.classList.remove('active'));
+                
+                const correctEl = document.getElementById('seat-group-' + correctId);
+                if(correctEl) {
+                    correctEl.parentNode.appendChild(correctEl); // Porta in primo piano
+                    correctEl.classList.add('quiz-correct');
+                }
+                
+                if (guessedId && guessedId != correctId) {
+                    const guessedEl = document.getElementById('seat-group-' + guessedId);
+                    if(guessedEl) {
+                        guessedEl.parentNode.appendChild(guessedEl); // Porta in primo piano
+                        guessedEl.classList.add('quiz-wrong');
+                    }
+                }
+            }
+            
+            if (data.type === 'reset' && MODE === 'quiz') {
+                document.querySelectorAll('.seat-group').forEach(el => el.classList.remove('active', 'quiz-correct', 'quiz-wrong'));
+            }
+        });
+
+        function cleanGroupName(name) {
+            if (!name) return "Misto";
+            switch (name.toUpperCase()) {
+                case 'FRATELLI D\'ITALIA': return 'FDI';
+                case 'LEGA': return 'LEGA';
+                case 'FORZA ITALIA - PPE': return 'FI-PPE';
+                case 'GRUPPO MISTO': return 'Misto';
+                case 'PARTITO DEMOCRATICO - ITALIA DEMOCRATICA E PROGRESSISTA': return 'PD-IDP';
+                case 'MOVIMENTO 5 STELLE': return 'M5S';
+                case 'ALLEANZA VERDI E SINISTRA': return 'AVS';
+                case 'ITALIA VIVA - IL CENTRO - RENEW EUROPE': return 'IVICRE';
+                case 'AZIONE - POPOLARI REFORMERS - RENEW EUROPE': return 'AZ-PER';
+                case 'NOI MODERATI (MAIE) - MISTO': return 'NM-M-C';
+                default: return name.trim().replace(/[^a-zA-Z0-9\-_]/g, '');
+            }
+        }
+        
+        function autoCenterMap() {
+            const svg = document.getElementById('emiciclo-svg');
+            const group = document.getElementById('seats-group');
+            const bbox = group.getBBox();
+            const padding = 100; 
+            svg.setAttribute('viewBox', `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + padding*2} ${bbox.height + padding*2}`);
+        }
+
+        function initPanzoom() {
+            const elem = document.getElementById('panzoom-element');
+            const options = { maxScale: 8, minScale: 0.1, contain: false, canvas: true, touchAction: 'none' };
+            if(MODE === 'embed') options.disablePan = true; 
+            pz = Panzoom(elem, options);
+            elem.parentElement.addEventListener('wheel', pz.zoomWithWheel);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
