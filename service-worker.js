@@ -1,14 +1,13 @@
-// 1. CAMBIA IL NOME DELLA CACHE OGNI VOLTA CHE AGGIORNI!
-const CACHE_NAME = 'allenamento-deputati-v5';
+const CACHE_NAME = 'allenamento-deputati-v6'; // Aggiornato a v6
 
-// 2. AGGIUNGI TUTTI I FILE DELL'APP SHELL
-const URLS_TO_CACHE = [
+// LISTA CRITICA: Se uno di questi file manca sul server, L'OFFLINE NON FUNZIONERÀ MAI.
+// Controlla bene di avere le icone o commentale se non le hai ancora create!
+const APP_SHELL = [
   '/', 
-  
-  // LOGICA E DATI (Fondamentale: aggiunto seggi.json)
+  '/static/manifest.json',
   '/static/training_logic.js',
   '/static/seggi.json', 
-
+  
   // CSS
   '/static/training_styles.css',
   '/static/dove_siedono.css',
@@ -19,97 +18,100 @@ const URLS_TO_CACHE = [
   // HTML Aggiuntivi
   '/static/emiciclo.html',
   '/static/emiciclo_quiz.html',
-  '/static/emiciclo_map.html', // Aggiunto per sicurezza
+  '/static/emiciclo_map.html', // Assicurati che questo file esista!
 
-  // Manifest e icone
-  '/static/manifest.json',
-  '/static/icons/icon-192x192.png',
-  '/static/icons/icon-512x512.png',
-
-  // Audio (Aggiunti i buzzer che mancavano)
+  // AUDIO (Assicurati che esistano tutti!)
   '/static/audio/correct.wav',
   '/static/audio/incorrect.wav',
   '/static/audio/round_start.wav',
   '/static/audio/buzzer_blu.wav',
-  '/static/audio/buzzer_verde.wav'
+  '/static/audio/buzzer_verde.wav',
+
+  // ICONE (Se non le hai create, COMMENTA QUESTE DUE RIGHE col // davanti)
+  '/static/icons/icon-192x192.png',
+  '/static/icons/icon-512x512.png'
 ];
 
-// 1. Evento "install"
+// 1. INSTALLAZIONE: Scarica l'App Shell (Sito base)
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Cache aperta:', CACHE_NAME);
-        return cache.addAll(URLS_TO_CACHE);
+        console.log('[Service Worker] Caching App Shell');
+        // Se qui c'è un errore (es. file mancante), l'installazione si ferma.
+        return cache.addAll(APP_SHELL);
       })
+      .catch(err => console.error('[Service Worker] Errore Installazione. Manca un file?', err))
   );
-  
-  // Forza il service worker a passare dallo stato "waiting" ad "active"
   self.skipWaiting();
 });
 
+// 2. ATTIVAZIONE: Pulizia vecchie cache
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keyList => {
+      return Promise.all(keyList.map(key => {
+        if (key !== CACHE_NAME) {
+          return caches.delete(key);
+        }
+      }));
+    })
+  );
+  return self.clients.claim();
+});
 
-// 2. Evento "fetch": si attiva ogni volta che la pagina fa una richiesta di rete
+// 3. FETCH: Il cuore dell'offline
 self.addEventListener('fetch', event => {
+  
+  // A. GESTIONE NAVIGAZIONE (Quando apri l'app o ricarichi la pagina)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => {
+          // SE SEI OFFLINE: Restituisci la pagina principale dalla cache
+          return caches.match('/')
+              .then(response => {
+                  if (response) return response;
+                  // Fallback estremo se '/' non è in cache (non dovrebbe succedere)
+                  return new Response("Sei offline e la cache è vuota. Riconnettiti per scaricare l'app.");
+              });
+        })
+    );
+    return;
+  }
+
+  // B. GESTIONE RISORSE (Immagini, CSS, JS, JSON)
   event.respondWith(
-    caches.match(event.request).then(response => {
-      // 1. Se è in cache, restituisci subito
-      if (response) {
-        return response;
+    caches.match(event.request).then(cachedResponse => {
+      // 1. Se è in cache (es. foto scaricata col pulsante), usala subito!
+      if (cachedResponse) {
+        return cachedResponse;
       }
 
       // 2. Altrimenti vai in rete
       return fetch(event.request).then(networkResponse => {
         
-        // A. GESTIONE IMMAGINI ESTERNE (Camera.it)
-        // Le immagini 'no-cors' hanno status 0 e type 'opaque'. Dobbiamo salvarle comunque!
+        // GESTIONE FOTO ESTERNE (Camera.it)
         if (event.request.url.includes('documenti.camera.it')) {
-             // Se la risposta è valida o opaca (status 0), la cachiamo
+             // Salviamo anche le risposte opache (status 0) o ok (200)
              if (networkResponse.type === 'opaque' || networkResponse.status === 200) {
-                 const responseToCache = networkResponse.clone();
-                 caches.open(CACHE_NAME).then(cache => {
-                     cache.put(event.request, responseToCache);
-                 });
+                 const clone = networkResponse.clone();
+                 caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
              }
              return networkResponse;
         }
 
-        // B. GESTIONE STANDARD (File interni della tua app)
-        // Se non è valido o non è status 200, non cachare (evita di salvare errori 404/500)
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
+        // GESTIONE ALTRI FILE INTERNI
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
 
-        // C. CACHE DEI FILE INTERNI
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseToCache);
-        });
-
         return networkResponse;
+      }).catch(() => {
+         // Niente rete e niente cache per questa risorsa
+         console.log('Risorsa non disponibile offline:', event.request.url);
       });
-    })
-  );
-});
-
-
-// 3. Evento "activate"
-self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME]; // Solo la nuova cache 'v4' è permessa
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          // Se il nome della cache NON è nella whitelist (è una vecchia cache 'v3')
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            console.log('Cancellazione vecchia cache:', cacheName);
-            return caches.delete(cacheName); // Cancellala
-          }
-        })
-      );
-    }).then(() => {
-      // Prende il controllo immediato di tutte le pagine aperte
-      return self.clients.claim();
     })
   );
 });
