@@ -942,6 +942,91 @@ document.addEventListener('DOMContentLoaded', () => {
         setupScreen.classList.remove('hidden');
         toggleDeputySourceControls(); 
     }
+
+    document.getElementById('btn-download-offline').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-download-offline');
+    const progressBar = document.getElementById('offline-progress');
+    const progressText = document.getElementById('progress-text');
+    const container = document.getElementById('progress-container');
+
+    btn.disabled = true;
+    btn.innerText = "Avvio download...";
+    container.style.display = 'block';
+
+    try {
+        console.log("Inizio recupero seggi.json...");
+        const response = await fetch('/static/seggi.json');
+        if (!response.ok) throw new Error("Impossibile leggere seggi.json");
+        
+        const data = await response.json();
+        
+        // Adegua questo in base alla struttura del tuo JSON!
+        // Se il JSON è una lista diretta: const deputati = data;
+        // Se il JSON ha una chiave 'seggi': const deputati = data.seggi;
+        let deputati = data.seggi || data; 
+        
+        if (!deputati || deputati.length === 0) {
+            alert("Errore: Lista deputati vuota o non trovata nel JSON.");
+            btn.disabled = false;
+            return;
+        }
+
+        console.log(`Trovati ${deputati.length} deputati. Inizio download immagini...`);
+
+        const total = deputati.length;
+        let count = 0;
+        let successCount = 0;
+
+        // Funzione che scarica UNA immagine
+        const fetchImage = async (item) => {
+            // Recupera l'ID in modo sicuro. Controlla nel tuo JSON come si chiama il campo!
+            // Esempio: item.persona.id oppure item.id
+            let id = item.persona ? item.persona.id : item.id; 
+            
+            if (!id) {
+                console.warn("ID mancante per:", item);
+                return;
+            }
+
+            // Costruisci l'URL. Assicurati che sia identico a quello usato nel gioco.
+            // Rimuovi eventuali spazi o caratteri strani
+            id = String(id).trim(); 
+            
+            // URL UFFICIALE CAMERA (aggiornato per sicurezza)
+            const imgUrl = `https://documenti.camera.it/foto/deputati/foto_19/${id}.jpg`;
+
+            try {
+                // mode: 'no-cors' è fondamentale per non avere errori rossi in console
+                await fetch(imgUrl, { mode: 'no-cors' });
+                successCount++;
+            } catch (e) {
+                console.warn(`Fallito download ID ${id}:`, e);
+            } finally {
+                count++;
+                const percent = Math.round((count / total) * 100);
+                progressBar.value = percent;
+                progressText.innerText = `${percent}% (${count}/${total})`;
+            }
+        };
+
+        // SCARICA A BLOCCHI DI 10 (Più veloce ma non impalla)
+        const chunkSize = 10;
+        for (let i = 0; i < deputati.length; i += chunkSize) {
+            const chunk = deputati.slice(i, i + chunkSize);
+            await Promise.all(chunk.map(fetchImage));
+        }
+
+        btn.innerText = "✅ Fatto!";
+        alert(`Download completato! ${successCount} immagini salvate in cache.`);
+
+    } catch (err) {
+        console.error("Errore fatale download:", err);
+        btn.innerText = "❌ Errore";
+        alert("C'è stato un errore. Apri la console (F12) per i dettagli.");
+    } finally {
+        btn.disabled = false;
+    }
+});
     
     function quitGame() {
         if (nextQuestionTimeout) clearTimeout(nextQuestionTimeout);

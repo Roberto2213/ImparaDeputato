@@ -52,48 +52,43 @@ self.addEventListener('install', event => {
 // 2. Evento "fetch": si attiva ogni volta che la pagina fa una richiesta di rete
 self.addEventListener('fetch', event => {
   event.respondWith(
-    // Prova a trovare la risorsa nella cache.
-    caches.match(event.request)
-      .then(response => {
-        // Se la risorsa è in cache, restituiscila.
-        if (response) {
-          return response;
+    caches.match(event.request).then(response => {
+      // 1. Se è in cache, restituisci subito
+      if (response) {
+        return response;
+      }
+
+      // 2. Altrimenti vai in rete
+      return fetch(event.request).then(networkResponse => {
+        
+        // A. GESTIONE IMMAGINI ESTERNE (Camera.it)
+        // Le immagini 'no-cors' hanno status 0 e type 'opaque'. Dobbiamo salvarle comunque!
+        if (event.request.url.includes('documenti.camera.it')) {
+             // Se la risposta è valida o opaca (status 0), la cachiamo
+             if (networkResponse.type === 'opaque' || networkResponse.status === 200) {
+                 const responseToCache = networkResponse.clone();
+                 caches.open(CACHE_NAME).then(cache => {
+                     cache.put(event.request, responseToCache);
+                 });
+             }
+             return networkResponse;
         }
 
-        // Altrimenti, fai la richiesta di rete.
-        return fetch(event.request).then(
-          networkResponse => {
-            // Se la richiesta ha successo, mettiamola in cache per il futuro.
-            // Controlliamo che la risposta sia valida prima di metterla in cache.
-            if (!networkResponse || networkResponse.status !== 200) {
-                 return networkResponse;
-            }
-            
-            // Gestione speciale per le foto, ma va bene anche per altri
-             if (networkResponse.type !== 'basic' && !networkResponse.type === 'cors') {
-                 if (event.request.url.startsWith('https://documenti.camera.it')) {
-                     // Gestiamo le foto dei deputati
-                     return caches.open(CACHE_NAME).then(cache => {
-                         cache.put(event.request, networkResponse.clone());
-                         return networkResponse;
-                     });
-                 }
-                 return networkResponse;
-            }
+        // B. GESTIONE STANDARD (File interni della tua app)
+        // Se non è valido o non è status 200, non cachare (evita di salvare errori 404/500)
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          return networkResponse;
+        }
 
-            // Cloniamo la risposta perché può essere letta una sola volta.
-            const responseToCache = networkResponse.clone();
+        // C. CACHE DEI FILE INTERNI
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
+        });
 
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                // Metti in cache la nuova risorsa (JS, CSS, API, FOTO, ecc.)
-                cache.put(event.request, responseToCache);
-              });
-
-            return networkResponse;
-          }
-        );
-      })
+        return networkResponse;
+      });
+    })
   );
 });
 
