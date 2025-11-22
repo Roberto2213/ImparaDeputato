@@ -7,13 +7,16 @@
 
     <link rel="manifest" href="/static/manifest.json">
     <meta name="theme-color" content="#6366f1">
-    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="/static/training_styles.css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deputati">
+<link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
 </head>
 <body>
     <div class="container">
@@ -259,7 +262,7 @@
             <p>
                 Made with ❤️ by <a href="https://github.com/Roberto2213" target="_blank" rel="noopener noreferrer">Roberto Bastevole</a> Data from <a href="https://data.camera.it" target="_blank" rel="noopener noreferrer">data.camera.it</a>.
             </p>
-            <p>Rilasciato sotto licenza CC-BY-SA-4.0 license.</p>
+            <p>Rilasciato sotto licenza CC-BY-SA-4.0 license. <a href="https://data.camera.it" target="_blank" rel="noopener noreferrer">data.camera.it</a></p>
         </footer>
 
     </div>
@@ -309,6 +312,7 @@
     <audio id="audio-incorrect" src="/static/audio/incorrect.wav" preload="auto"></audio>
     <audio id="audio-start" src="/static/audio/round_start.wav" preload="auto"></audio>
 
-    <script src="/static/training_logic.js" defer></script>
+    <script src="/static/training_logic.js" defer>
+    </script>
 </body>
 </html>
