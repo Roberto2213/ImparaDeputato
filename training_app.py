@@ -1,23 +1,23 @@
 import json
 import os
-# --- MODIFICA 1: Aggiungi 'make_response' ---
 from flask import Flask, render_template, jsonify, send_from_directory, make_response
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
+# Determina il percorso assoluto della cartella dove si trova lo script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
-CACHE_FILE = 'data_cache.json'
+app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+
+CACHE_FILE = os.path.join(BASE_DIR, 'data_cache.json')
 DEPUTIES_DATA = []
 COMMITTEE_FILTER_LIST = []
 
 def load_data_from_cache():
-    """
-    Carica i dati pre-elaborati dal file JSON di cache.
-    """
     global DEPUTIES_DATA, COMMITTEE_FILTER_LIST
     
     if not os.path.exists(CACHE_FILE):
         print(f"ATTENZIONE: File '{CACHE_FILE}' non trovato!")
-        print("Esegui prima 'python build_data_cache.py' per generare i dati.")
         return
 
     try:
@@ -25,46 +25,34 @@ def load_data_from_cache():
             data = json.load(f)
             DEPUTIES_DATA = data.get('deputies', [])
             COMMITTEE_FILTER_LIST = data.get('committees', [])
-            
-        print(f"Dati caricati da cache. {len(DEPUTIES_DATA)} deputati pronti.")
+        print(f"Dati caricati: {len(DEPUTIES_DATA)} deputati.")
     except Exception as e:
-        print(f"Errore durante il caricamento della cache: {e}")
+        print(f"Errore caricamento cache: {e}")
 
 def get_all_groups(deputies_list):
-    """
-    Estrae l'elenco unico dei gruppi.
-    """
     if not deputies_list: return []
     groups = set(d['simple_group'] for d in deputies_list if d['simple_group'])
     return sorted(list(groups))
 
-# --- CARICAMENTO DATI ALL'AVVIO ---
 load_data_from_cache()
-
-# --- Endpoint Web ---
 
 @app.route('/')
 def index():
     return render_template('training.html')
 
-# --- MODIFICA 2: Aggiorna questa funzione ---
 @app.route('/service-worker.js')
 def service_worker():
-    """
-    Serve il service worker con header che VIETANO il caching.
-    Questo forza il browser a controllare sempre se c'è una nuova versione.
-    """
-    # Crea una risposta in modo da poter modificare gli header
-    response = make_response(send_from_directory('.', 'service-worker.js'))
-    
-    # Forza il browser a non mettere MAI in cache questo specifico file.
+    response = make_response(send_from_directory(BASE_DIR, 'service-worker.js'))
+    # Header vitali per lo sviluppo dei Service Worker:
+    # Disabilita la cache del browser per il file JS del worker stesso
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     return response
 
 @app.route('/api/deputies')
 def get_deputies():
+    # Poiché i dati cambiano raramente, qui potremmo permettere il caching,
+    # ma per sicurezza in fase di dev lasciamo no-cache o default.
     return jsonify(DEPUTIES_DATA)
 
 @app.route('/api/groups')
@@ -80,16 +68,17 @@ def get_committees():
 def mappa_moderna():
     return render_template('emiciclo_moderno.html')
 
-# AGGIUNGI QUESTA ROTTA PER IL MANIFEST (Opzionale ma consigliato)
 @app.route('/manifest.json')
 def manifest():
-    return send_from_directory('static', 'manifest.json')
+    return send_from_directory(STATIC_DIR, 'manifest.json')
 
 if __name__ == '__main__':
-    if not DEPUTIES_DATA:
-        print("\nATTENZIONE: Nessun dato caricato. L'app potrebbe non funzionare correttamente.")
-        print(f"Assicurati di aver eseguito 'python build_data_cache.py'.\n")
+    # Configurazione robusta per l'esecuzione
+    port = int(os.environ.get("PORT", 5000))
+    debug_mode = os.environ.get("FLASK_DEBUG", "True") == "True"
     
-    print("\nServer modalità Allenamento pronto (Versione Ottimizzata).")
-    print("Apri il browser su http://127.0.0.1:5000")
-    app.run(debug=True, port=5000)
+    if not DEPUTIES_DATA:
+        print(f"WARN: Cache vuota. Esegui 'python build_data_cache.py' nella cartella {BASE_DIR}")
+
+    print(f"Server avviato su http://127.0.0.1:{port}")
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
