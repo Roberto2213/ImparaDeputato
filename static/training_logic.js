@@ -163,6 +163,43 @@ document.addEventListener('DOMContentLoaded', () => {
     let sessionGroupFilter = 'Tutti';
     let iframeReady = false;
 
+// INIZIO AGGIUNTA: Logica di Aggiornamento Forzato
+    const btnForceUpdate = document.getElementById('btn-force-update');
+    if (btnForceUpdate) {
+        btnForceUpdate.addEventListener('click', async () => {
+            const confirmUpdate = confirm("Vuoi forzare l'aggiornamento dell'app? Verrà scaricata l'ultima versione disponibile.");
+            if (!confirmUpdate) return;
+
+            btnForceUpdate.innerText = "⏳ Aggiornamento...";
+            btnForceUpdate.disabled = true;
+
+            try {
+                // 1. Disinstalla tutti i Service Worker attivi
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                    }
+                }
+                
+                // 2. Svuota tutte le Cache salvate dal browser
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                }
+
+                // 3. Forza un ricaricamento totale della pagina (bypassando la cache rimasta)
+                window.location.reload(true);
+            } catch (err) {
+                console.error("Errore durante l'aggiornamento:", err);
+                alert("Si è verificato un errore durante l'aggiornamento. Ricarica la pagina manualmente.");
+                btnForceUpdate.innerText = "🔄 Aggiorna App";
+                btnForceUpdate.disabled = false;
+            }
+        });
+    }
+    // FINE AGGIUNTA
+
     async function initialize() {
         const [deputiesRes, groupsRes, committeesRes] = await Promise.all([
             fetch('/api/deputies'),
