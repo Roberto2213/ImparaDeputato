@@ -46,6 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const groupSelectContainer = document.getElementById('group-select-container');
     const roundsInputContainer = document.getElementById('rounds-input-container');
     const groupSelect = document.getElementById('group-select');
+    
+    // INIZIO AGGIUNTA: Elementi Filtro Commissione
+    const committeeSelectContainer = document.getElementById('committee-select-container');
+    const committeeSelect = document.getElementById('committee-select');
+    // FINE AGGIUNTA
+    
     const roundsInput = document.getElementById('rounds-input');
     const startBtn = document.getElementById('start-btn');
     const deputyCountInfo = document.getElementById('deputy-count-info');
@@ -181,6 +187,11 @@ document.addEventListener('DOMContentLoaded', () => {
         searchCommitteeSelect.innerHTML = committeeOptionsHTML;
         selectCommitteeSelect.innerHTML = committeeOptionsHTML;
         
+        // INIZIO AGGIUNTA: Popola il filtro commissione nel setup
+        committeeSelect.innerHTML = committeeOptionsHTML;
+        committeeSelect.addEventListener('change', updateDeputyCount);
+        // FINE AGGIUNTA
+        
         updateDeputyCount();
         groupSelect.addEventListener('change', updateDeputyCount);
         
@@ -212,6 +223,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // --- MODIFICA: Filtra i cessati anche dal conteggio ---
         availableDeputies = availableDeputies.filter(d => d.status !== 'cessato');
+
+        // INIZIO AGGIUNTA: Applica il filtro della commissione al conteggio
+        const selectedCommittee = committeeSelect.value;
+        if (selectedCommittee && selectedCommittee !== 'Tutte') {
+            availableDeputies = availableDeputies.filter(d => d.committees && d.committees.includes(selectedCommittee));
+        }
+        // FINE AGGIUNTA
         
         if (currentMode === 'seat' || currentMode === 'click-seat') {
             availableCount = availableDeputies.filter(d => d.seat && d.seat !== 'N/D').length;
@@ -219,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
             availableCount = availableDeputies.length;
         }
         
-        deputyCountInfo.textContent = `${availableCount} deputati disponibili (in carica) in questo gruppo`;
+        deputyCountInfo.textContent = `${availableCount} deputati disponibili (in carica) per questa selezione`;
     }
     
     gameModeSelect.addEventListener('change', updateDeputyCount);
@@ -228,11 +246,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const source = deputySourceSelect.value;
         if (source === 'manual') {
             groupSelectContainer.classList.add('hidden');
+            committeeSelectContainer.classList.add('hidden'); // AGGIUNTA
             roundsInputContainer.classList.add('hidden');
             manualSelectionControls.classList.remove('hidden');
             deputyCountInfo.classList.add('hidden');
         } else {
             groupSelectContainer.classList.remove('hidden');
+            committeeSelectContainer.classList.remove('hidden'); // AGGIUNTA
             roundsInputContainer.classList.remove('hidden');
             manualSelectionControls.classList.add('hidden');
             deputyCountInfo.classList.remove('hidden');
@@ -386,6 +406,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // --- MODIFICA: Filtra i cessati ---
             availableDeputies = filteredByGroup.filter(d => d.status !== 'cessato');
+
+            // INIZIO AGGIUNTA: Applica il filtro della commissione ai deputati disponibili
+            const sessionCommitteeFilter = committeeSelect.value;
+            if (sessionCommitteeFilter && sessionCommitteeFilter !== 'Tutte') {
+                availableDeputies = availableDeputies.filter(d => d.committees && d.committees.includes(sessionCommitteeFilter));
+            }
+            // FINE AGGIUNTA
         }
         
         if (currentGameMode === 'seat' || currentGameMode === 'click-seat') {
@@ -393,18 +420,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (availableDeputies.length === 0) {
                 const msg = source === 'manual' 
                     ? "Nessuno dei deputati selezionati (in carica) ha un seggio valido per questa modalità."
-                    : "Non ci sono deputati (in carica) con un seggio assegnato in questo gruppo per questa modalità.";
+                    : "Non ci sono deputati (in carica) con un seggio assegnato con questi filtri per questa modalità.";
                 alert(msg);
                 return;
             }
         } else if (currentGameMode === 'classic' && availableDeputies.length < 4) {
              const msg = source === 'manual'
                 ? "Devi selezionare almeno 4 deputati (in carica) per la modalità Classica."
-                : "Questo gruppo non ha abbastanza deputati (in carica, minimo 4) per iniziare l'allenamento.";
+                : "Questi filtri non offrono abbastanza deputati (in carica, minimo 4) per iniziare l'allenamento.";
             alert(msg);
             return;
         } else if (availableDeputies.length === 0 && source !== 'manual') {
-            alert("Nessun deputato (in carica) disponibile per questo gruppo.");
+            alert("Nessun deputato (in carica) disponibile per questa selezione.");
             return;
         }
 
