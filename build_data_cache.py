@@ -1,25 +1,16 @@
 import json
 import re
 import requests
-import unicodedata
 import time
 import os
-from bs4 import BeautifulSoup
 
 # --- CONFIGURAZIONE ---
 LEGISLATURA = 19
 SPARQL_ENDPOINT = "https://dati.camera.it/sparql"
 OUTPUT_FILE = 'data_cache.json'
+URL_EMICICLO_CAMERA = "https://www.camera.it/deputati/"
 
 # --- FUNZIONI DI UTILITÀ ---
-
-def create_canonical_key(name_str):
-    """Crea una chiave univoca dal nome per evitare duplicati"""
-    nfkd_form = unicodedata.normalize('NFKD', name_str)
-    only_ascii = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
-    cleaned_str = re.sub('[^a-zA-Z ]', '', only_ascii).upper()
-    parts = sorted(cleaned_str.split())
-    return "".join(parts)
 
 def build_new_photo_url(uri, legislatura):
     """Costruisce l'URL della foto partendo dall'URI del deputato"""
@@ -76,31 +67,35 @@ def get_sorted_committees(all_committee_names):
     return (sorted(p1_roman) + sorted(p2_bicameral) + 
             sorted(p3_giunte) + sorted(p4_inchiesta) + sorted(p5_others))
 
-def load_seat_map(canonical_key_func):
-    """Legge il file HTML dell'emiciclo per mappare i seggi dei deputati"""
+def load_seat_map():
+    """Scarica la mappa dei seggi dinamicamente dal sito della Camera e la indicizza per ID"""
     seat_map = {}
-    file_path = 'static/emiciclo.html'
+    print(f"📡 Scaricamento mappa seggi in tempo reale da {URL_EMICICLO_CAMERA}...")
+    
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            soup = BeautifulSoup(f, 'html.parser')
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"}
+        response = requests.get(URL_EMICICLO_CAMERA, headers=headers, timeout=15)
+        response.raise_for_status()
         
-        seats = soup.select('a[id^="seggio_"][title*=" - "]')
-        for seat in seats:
-            try:
-                title_text = seat['title']
-                seat_number = title_text.split(' - ')[0].strip()
-                name_and_group = title_text.split(' - ')[1]
-                # Prende il nome ignorando il gruppo (es. "ROSSI Mario (Misto)" -> "ROSSI Mario")
-                name_str = name_and_group.rsplit(' ', 1)[0].strip()
-                key = canonical_key_func(name_str)
-                if key:
-                    seat_map[key] = seat_number
-            except Exception:
-                continue
-    except FileNotFoundError:
-        print(f"ATTENZIONE: File '{file_path}' non trovato. I seggi non verranno mappati.")
+        # Cerchiamo la variabile JS 'var deputati = [...];' nel codice della pagina
+        match = re.search(r'var\s+deputati\s*=\s*(\[.*?\]);', response.text, re.DOTALL)
+        if match:
+            deputati_json_str = match.group(1)
+            deputati_data = json.loads(deputati_json_str)
+            
+            for dep in deputati_data:
+                # Estraiamo l'ID numerico ufficiale del deputato e il suo posto
+                dep_id = str(dep.get("idAulDeputato", ""))
+                posto = str(dep.get("posto", ""))
+                
+                if dep_id and posto and posto != "None":
+                    seat_map[dep_id] = posto
+        else:
+            print("⚠️ Variabile 'var deputati' non trovata nella pagina della Camera.")
+            
     except Exception as e:
-        print(f"Errore durante la lettura di '{file_path}': {e}")
+        print(f"⚠️ Errore durante il recupero dei seggi: {e}")
+        
     return seat_map
 
 # --- RECUPERO DATI LIVE DA DATI.CAMERA.IT ---
@@ -158,8 +153,7 @@ def fetch_deputies_live(legislatura, max_retries=3, delay_seconds=5):
     
     for attempt in range(max_retries):
         try:
-            print(f"⏳ Esecuzione query SPARQL (Tentativo {attempt + 1}/{max_retries}). Attendere prego, potrebbe richiedere fino a un minuto...")
-            # TIMEOUT AUMENTATO A 120 SECONDI
+            print(f"⏳ Esecuzione query SPARQL (Tentativo {attempt + 1}/{max_retries}). Attendere prego...")
             response = requests.get(SPARQL_ENDPOINT, params={"query": query}, headers=headers, timeout=120)
             response.raise_for_status() 
             print("✅ Dati scaricati con successo!")
@@ -168,7 +162,7 @@ def fetch_deputies_live(legislatura, max_retries=3, delay_seconds=5):
         except requests.exceptions.HTTPError as e:
             status_code = e.response.status_code
             if status_code in [500, 502, 503, 504]:
-                print(f"⚠️  I server della Camera hanno risposto con errore {status_code}.")
+                print(f"⚠️ I server della Camera hanno risposto con errore {status_code}.")
                 if attempt < max_retries - 1:
                     print(f"Riprovo tra {delay_seconds} secondi...")
                     time.sleep(delay_seconds)
@@ -176,7 +170,7 @@ def fetch_deputies_live(legislatura, max_retries=3, delay_seconds=5):
                 raise Exception(f"Errore fatale nella query: HTTP {status_code}")
                 
         except requests.exceptions.RequestException as e:
-            print(f"⚠️  Errore di rete: {e}")
+            print(f"⚠️ Errore di rete: {e}")
             if attempt < max_retries - 1:
                 print(f"Riprovo tra {delay_seconds} secondi...")
                 time.sleep(delay_seconds)
@@ -190,9 +184,9 @@ def build_cache():
     print("🚀 AVVIO AGGIORNAMENTO DATI IMPARA DEPUTATO")
     print("="*50)
     
-    # 1. CARICA LA MAPPA DEI SEGGI DAL FILE LOCALE HTML
-    seat_map = load_seat_map(create_canonical_key)
-    print(f"🪑 Mappa seggi caricata: {len(seat_map)} postazioni trovate in 'static/emiciclo.html'")
+    # 1. SCARICA LA MAPPA DEI SEGGI (Indicizzata per ID Deputato)
+    seat_map = load_seat_map()
+    print(f"🪑 Mappa seggi generata: {len(seat_map)} postazioni trovate sul sito ufficiale.")
     
     # 2. SCARICA I DATI VIA SPARQL
     try:
@@ -215,16 +209,24 @@ def build_cache():
         uri = row.get("d", {}).get("value", "")
         if not uri: continue
         
+        # Estraiamo l'ID numerico dall'URI SPARQL (es: da .../d308825 estrae 308825)
+        match_id = re.search(r'd(\d+)', uri)
+        dep_id = match_id.group(1) if match_id else None
+        
         cognome = row.get("cognome", {}).get("value", "").title()
         nome = row.get("nome", {}).get("value", "").title()
         full_name = f"{cognome} {nome}"
-        key = create_canonical_key(full_name)
         
-        # Se incontriamo il deputato per la prima volta, creiamo il suo record
-        if key not in deputies_dict:
+        # Usiamo l'ID Deputato come chiave primaria del dizionario per raggruppare i record
+        dict_key = dep_id if dep_id else full_name
+        
+        if dict_key not in deputies_dict:
             gruppo_raw = row.get("nomeGruppo", {}).get("value", "Misto")
             
-            deputies_dict[key] = {
+            # Recuperiamo il posto esatto usando l'ID
+            assigned_seat = seat_map.get(dep_id, "N/D") if dep_id else "N/D"
+            
+            deputies_dict[dict_key] = {
                 "name": full_name,
                 "photo_url": build_new_photo_url(uri, LEGISLATURA),
                 "group": gruppo_raw,
@@ -233,15 +235,14 @@ def build_cache():
                 "gender": row.get("genere", {}).get("value", "N/D"),
                 "constituency": row.get("collegio", {}).get("value", "N/D"),
                 "committees": set(),
-                # 3. ASSEGNA IL SEGGIO LEGGENDOLO DALLA MAPPA LOCALE
-                "seat": seat_map.get(key, "N/D") 
+                "seat": assigned_seat
             }
             
-        # Aggiungiamo le commissioni (usando i set evitiamo duplicati)
+        # Aggiungiamo le commissioni
         commissione = row.get("commissione", {}).get("value")
         if commissione:
             clean_comm = commissione.strip()
-            deputies_dict[key]["committees"].add(clean_comm)
+            deputies_dict[dict_key]["committees"].add(clean_comm)
             all_committees.add(clean_comm)
 
     # Convertiamo il dizionario in lista ordinata per il JSON finale
@@ -255,7 +256,7 @@ def build_cache():
 
     committee_filter_list = get_sorted_committees(all_committees)
 
-    # Salvataggio del JSON finale sovrascrivendo la vecchia cache
+    # Salvataggio del JSON finale
     cache_data = {
         "deputies": final_deputies,
         "committees": committee_filter_list

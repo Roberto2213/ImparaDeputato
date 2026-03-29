@@ -47,10 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const roundsInputContainer = document.getElementById('rounds-input-container');
     const groupSelect = document.getElementById('group-select');
     
-    // INIZIO AGGIUNTA: Elementi Filtro Commissione
     const committeeSelectContainer = document.getElementById('committee-select-container');
     const committeeSelect = document.getElementById('committee-select');
-    // FINE AGGIUNTA
     
     const roundsInput = document.getElementById('rounds-input');
     const startBtn = document.getElementById('start-btn');
@@ -108,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchGruppoSelect = document.getElementById('search-gruppo-select');
     const searchCommitteeSelect = document.getElementById('search-committee-select');
     const searchResultsContainer = document.getElementById('search-results-container');
-    const searchShowCessati = document.getElementById('search-show-cessati'); // NUOVO
+    const searchShowCessati = document.getElementById('search-show-cessati'); 
     
     // Selection Screen elements
     const selectionCounter = document.getElementById('selection-counter');
@@ -120,9 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectionResultsContainer = document.getElementById('selection-results-container');
     const selectionSelectAllVisibleBtn = document.getElementById('selection-select-all-visible-btn');
     const selectionDeselectAllVisibleBtn = document.getElementById('selection-deselect-all-visible-btn');
-    const selectShowCessati = document.getElementById('select-show-cessati'); // NUOVO
+    const selectShowCessati = document.getElementById('select-show-cessati'); 
 
-    
     // Modal elements
     const modalContent = document.getElementById('modal-content');
     const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -142,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const emicicloViewCloseBtn = document.getElementById('emiciclo-view-close-btn');
     const emicicloViewIframe = document.getElementById('emiciclo-view-iframe');
 
-    // NUOVI ELEMENTI AUDIO
     const audioCorrect = document.getElementById('audio-correct');
     const audioIncorrect = document.getElementById('audio-incorrect');
     const audioStart = document.getElementById('audio-start');
@@ -163,7 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let sessionGroupFilter = 'Tutti';
     let iframeReady = false;
 
-// INIZIO AGGIUNTA: Logica di Aggiornamento Forzato
+    // INIZIO AGGIUNTA: Variabili per il calcolo dei punti in Super Difficile
+    let seggiData = [];
+    // FINE AGGIUNTA
+
     const btnForceUpdate = document.getElementById('btn-force-update');
     if (btnForceUpdate) {
         btnForceUpdate.addEventListener('click', async () => {
@@ -174,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btnForceUpdate.disabled = true;
 
             try {
-                // 1. Disinstalla tutti i Service Worker attivi
                 if ('serviceWorker' in navigator) {
                     const registrations = await navigator.serviceWorker.getRegistrations();
                     for (let registration of registrations) {
@@ -182,13 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 
-                // 2. Svuota tutte le Cache salvate dal browser
                 if ('caches' in window) {
                     const cacheNames = await caches.keys();
                     await Promise.all(cacheNames.map(name => caches.delete(name)));
                 }
 
-                // 3. Forza un ricaricamento totale della pagina (bypassando la cache rimasta)
                 window.location.reload(true);
             } catch (err) {
                 console.error("Errore durante l'aggiornamento:", err);
@@ -198,9 +194,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // INIZIO AGGIUNTA: Carica i dati dei seggi per poter calcolare la distanza
+    async function fetchSeggiData() {
+        try {
+            const res = await fetch('/static/seggi.json');
+            seggiData = await res.json();
+        } catch (e) {
+            console.error("Errore nel caricamento dei seggi:", e);
+        }
+    }
     // FINE AGGIUNTA
 
     async function initialize() {
+        // INIZIO AGGIUNTA: Precalcola i dati dei seggi all'avvio
+        await fetchSeggiData();
+        // FINE AGGIUNTA
+
         const [deputiesRes, groupsRes, committeesRes] = await Promise.all([
             fetch('/api/deputies'),
             fetch('/api/groups'),
@@ -224,10 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
         searchCommitteeSelect.innerHTML = committeeOptionsHTML;
         selectCommitteeSelect.innerHTML = committeeOptionsHTML;
         
-        // INIZIO AGGIUNTA: Popola il filtro commissione nel setup
         committeeSelect.innerHTML = committeeOptionsHTML;
         committeeSelect.addEventListener('change', updateDeputyCount);
-        // FINE AGGIUNTA
         
         updateDeputyCount();
         groupSelect.addEventListener('change', updateDeputyCount);
@@ -242,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectNomeInput.addEventListener('input', renderSelectionList);
         selectGruppoSelect.addEventListener('change', renderSelectionList);
         selectCommitteeSelect.addEventListener('change', renderSelectionList);
-        selectShowCessati.addEventListener('input', renderSelectionList); // NUOVO
+        selectShowCessati.addEventListener('input', renderSelectionList); 
         
         selectionSelectAllVisibleBtn.addEventListener('click', selectAllVisible);
         selectionDeselectAllVisibleBtn.addEventListener('click', deselectAllVisible);
@@ -258,15 +266,12 @@ document.addEventListener('DOMContentLoaded', () => {
             ? allDeputies
             : allDeputies.filter(d => d.simple_group === selectedGroup);
         
-        // --- MODIFICA: Filtra i cessati anche dal conteggio ---
         availableDeputies = availableDeputies.filter(d => d.status !== 'cessato');
 
-        // INIZIO AGGIUNTA: Applica il filtro della commissione al conteggio
         const selectedCommittee = committeeSelect.value;
         if (selectedCommittee && selectedCommittee !== 'Tutte') {
             availableDeputies = availableDeputies.filter(d => d.committees && d.committees.includes(selectedCommittee));
         }
-        // FINE AGGIUNTA
         
         if (currentMode === 'seat' || currentMode === 'click-seat') {
             availableCount = availableDeputies.filter(d => d.seat && d.seat !== 'N/D').length;
@@ -283,13 +288,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const source = deputySourceSelect.value;
         if (source === 'manual') {
             groupSelectContainer.classList.add('hidden');
-            committeeSelectContainer.classList.add('hidden'); // AGGIUNTA
+            committeeSelectContainer.classList.add('hidden'); 
             roundsInputContainer.classList.add('hidden');
             manualSelectionControls.classList.remove('hidden');
             deputyCountInfo.classList.add('hidden');
         } else {
             groupSelectContainer.classList.remove('hidden');
-            committeeSelectContainer.classList.remove('hidden'); // AGGIUNTA
+            committeeSelectContainer.classList.remove('hidden'); 
             roundsInputContainer.classList.remove('hidden');
             manualSelectionControls.classList.add('hidden');
             deputyCountInfo.classList.remove('hidden');
@@ -315,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nomeFilter = selectNomeInput.value.toLowerCase().trim();
         const gruppoFilter = selectGruppoSelect.value;
         const committeeFilter = selectCommitteeSelect.value;
-        const showCessati = selectShowCessati.checked; // NUOVO
+        const showCessati = selectShowCessati.checked; 
         
         selectionResultsContainer.innerHTML = ''; 
         
@@ -328,9 +333,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const matchNome = nome.startsWith(nomeFilter);
             const matchGruppo = (gruppoFilter === 'Tutti') || (deputy.simple_group === gruppoFilter);
             const matchCommittee = (committeeFilter === 'Tutte') || (deputy.committees.includes(committeeFilter));
-            const matchStatus = showCessati || deputy.status !== 'cessato'; // NUOVO
+            const matchStatus = showCessati || deputy.status !== 'cessato'; 
             
-            return matchCognome && matchNome && matchGruppo && matchCommittee && matchStatus; // MODIFICATO
+            return matchCognome && matchNome && matchGruppo && matchCommittee && matchStatus; 
         });
         
         if (filteredDeputies.length === 0) {
@@ -349,7 +354,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.classList.add('selected');
             }
             
-            // --- MODIFICA: Aggiungi tag (Cessato) ---
             const statusTag = deputy.status === 'cessato' ? ' <span class="status-tag">(Cessato)</span>' : '';
             
             item.innerHTML = `
@@ -413,7 +417,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startTraining() {
-        // NUOVO: Suono avvio
         audioStart.play().catch(e => console.warn("La riproduzione audio è stata bloccata dal browser."));
         
         currentGameMode = gameModeSelect.value;
@@ -425,7 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Non hai selezionato nessun deputato per l'allenamento!");
                 return;
             }
-            // --- MODIFICA: Filtra i cessati anche dalla lista custom ---
             availableDeputies = customDeputyList.filter(d => d.status !== 'cessato');
             
             if (availableDeputies.length === 0) {
@@ -441,15 +443,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? [...allDeputies]
                 : allDeputies.filter(d => d.simple_group === sessionGroupFilter);
             
-            // --- MODIFICA: Filtra i cessati ---
             availableDeputies = filteredByGroup.filter(d => d.status !== 'cessato');
 
-            // INIZIO AGGIUNTA: Applica il filtro della commissione ai deputati disponibili
             const sessionCommitteeFilter = committeeSelect.value;
             if (sessionCommitteeFilter && sessionCommitteeFilter !== 'Tutte') {
                 availableDeputies = availableDeputies.filter(d => d.committees && d.committees.includes(sessionCommitteeFilter));
             }
-            // FINE AGGIUNTA
         }
         
         if (currentGameMode === 'seat' || currentGameMode === 'click-seat') {
@@ -500,7 +499,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (currentGameMode === 'click-seat') {
             clickSeatGameScreen.classList.remove('hidden');
             const currentTheme = html.getAttribute('data-theme') || 'light';
-            // NUOVO CODICE: Usa emiciclo_universale in modalità quiz
             quizEmicicloIframe.src = `/emiciclo?mode=quiz&theme=${currentTheme}`;
         }
     }
@@ -520,7 +518,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const correctGender = correctDeputy.gender;
         let wrongOptionsPool;
         
-        // --- MODIFICA: Assicurati che il pool di opzioni sbagliate sia solo tra quelli in carica ---
         let sourcePool = (deputySourceSelect.value === 'manual' && customDeputyList.length >= 4)
             ? customDeputyList.filter(d => d.status !== 'cessato')
             : allDeputies.filter(d => d.status !== 'cessato');
@@ -544,7 +541,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (wrongOptions.length < 3) {
             let needed = 3 - wrongOptions.length;
             const existingNames = [correctDeputy.name, ...wrongOptions.map(d => d.name)];
-            // Fallback pool (sempre filtrato per 'in carica')
             let fallbackPool1 = allDeputies.filter(d => 
                 d.status !== 'cessato' &&
                 !existingNames.includes(d.name) &&
@@ -585,12 +581,12 @@ document.addEventListener('DOMContentLoaded', () => {
             clickedButton.classList.add('correct');
             feedbackText.textContent = '✓ Corretto!';
             feedbackText.className = 'feedback-text correct';
-            audioCorrect.play().catch(e => console.warn("Audio play failed")); // NUOVO
+            audioCorrect.play().catch(e => console.warn("Audio play failed")); 
         } else {
             clickedButton.classList.add('incorrect');
             feedbackText.textContent = `✗ Sbagliato! La risposta era ${correctDeputy.name}`;
             feedbackText.className = 'feedback-text incorrect';
-            audioIncorrect.play().catch(e => console.warn("Audio play failed")); // NUOVO
+            audioIncorrect.play().catch(e => console.warn("Audio play failed")); 
             document.querySelectorAll('.answer-btn').forEach(btn => {
                 if (btn.querySelector('.name').textContent === correctDeputy.name) {
                     btn.classList.add('correct');
@@ -668,11 +664,11 @@ document.addEventListener('DOMContentLoaded', () => {
             score++;
             manualFeedbackText.textContent = `✓ Corretto! Era ${fullAnswer}`;
             manualFeedbackText.className = 'feedback-text correct';
-            audioCorrect.play().catch(e => console.warn("Audio play failed")); // NUOVO
+            audioCorrect.play().catch(e => console.warn("Audio play failed")); 
         } else {
             manualFeedbackText.textContent = `✗ Sbagliato! La risposta corretta era ${fullAnswer}`;
             manualFeedbackText.className = 'feedback-text incorrect';
-            audioIncorrect.play().catch(e => console.warn("Audio play failed")); // NUOVO
+            audioIncorrect.play().catch(e => console.warn("Audio play failed")); 
         }
         updateGameHeader();
         currentQuestionIndex++;
@@ -726,11 +722,11 @@ document.addEventListener('DOMContentLoaded', () => {
             score++;
             seatFeedbackText.textContent = `✓ Corretto! È il seggio ${correctSeat}.`;
             seatFeedbackText.className = 'feedback-text correct';
-            audioCorrect.play().catch(e => console.warn("Audio play failed")); // NUOVO
+            audioCorrect.play().catch(e => console.warn("Audio play failed")); 
         } else {
             seatFeedbackText.textContent = `✗ Sbagliato! Era ${correctDeputy.name}, seggio ${correctSeat}.`;
             seatFeedbackText.className = 'feedback-text incorrect';
-            audioIncorrect.play().catch(e => console.warn("Audio play failed")); // NUOVO
+            audioIncorrect.play().catch(e => console.warn("Audio play failed")); 
         }
         updateGameHeader();
         currentQuestionIndex++;
@@ -762,11 +758,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // INIZIO AGGIUNTA: Logica calcolo punti Super Difficile con calcolo puramente progressivo
     function handleIframeAnswer(guessedSeat) {
         const correctSeat = correctDeputy.seat;
-        const isCorrect = (guessedSeat === correctSeat);
+        const isExactMatch = (String(guessedSeat) === String(correctSeat));
+        
+        let points = 0;
+        let feedback = '';
+        let isRoundCorrect = false;
 
-        sessionResults.push({ deputy: correctDeputy, correct: isCorrect });
+        const guessedNode = seggiData.find(s => String(s.id) === String(guessedSeat));
+        const correctNode = seggiData.find(s => String(s.id) === String(correctSeat));
+
+        if (isExactMatch) {
+            points = 100;
+            isRoundCorrect = true;
+            feedback = `✓ Perfetto! Hai indovinato il seggio esatto (${correctSeat}). +100 punti!`;
+            audioCorrect.play().catch(e => console.warn("Audio play failed"));
+            clickSeatFeedbackText.className = 'feedback-text correct';
+        } else if (guessedNode && correctNode) {
+            audioIncorrect.play().catch(e => console.warn("Audio play failed"));
+            clickSeatFeedbackText.className = 'feedback-text incorrect';
+            
+            // Calcolo proporzionale in base alla distanza
+            const dx = guessedNode.x - correctNode.x;
+            const dy = guessedNode.y - correctNode.y;
+            const distance = Math.sqrt(dx*dx + dy*dy);
+            
+            // La distanza massima nell'emiciclo è di circa 2200-2400 pixel da un estremo all'altro
+            const maxDist = 2200; 
+            
+            // Calcola i punti proporzionali (da 99 a 0, evitando valori negativi)
+            points = Math.max(0, Math.floor(100 * (1 - distance / maxDist)));
+            
+            // Se in qualche modo finisce a 100 senza averlo centrato esattamente, lo riduciamo a 99 per chiarezza
+            if (points === 100) points = 99;
+            
+            feedback = `Sbagliato! Hai ottenuto ${points} punti per la vicinanza. (Era il seggio ${correctSeat})`;
+        } else {
+             feedback = `✗ Sbagliato! ${correctDeputy.name} siede al ${correctSeat}.`;
+             audioIncorrect.play().catch(e => console.warn("Audio play failed"));
+             clickSeatFeedbackText.className = 'feedback-text incorrect';
+        }
+
+        // Salva i punti nel risultato della sessione e somma al punteggio
+        sessionResults.push({ deputy: correctDeputy, correct: isRoundCorrect, points: points });
+        score += points;
         
         if (quizEmicicloIframe.contentWindow) {
             quizEmicicloIframe.contentWindow.postMessage({ 
@@ -776,21 +813,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }, '*');
         }
 
-        if (isCorrect) {
-            score++;
-            clickSeatFeedbackText.textContent = `✓ Corretto! È il seggio ${correctSeat}.`;
-            clickSeatFeedbackText.className = 'feedback-text correct';
-            audioCorrect.play().catch(e => console.warn("Audio play failed")); // NUOVO
-        } else {
-            clickSeatFeedbackText.textContent = `✗ Sbagliato! ${correctDeputy.name} siede al ${correctSeat}.`;
-            clickSeatFeedbackText.className = 'feedback-text incorrect';
-            audioIncorrect.play().catch(e => console.warn("Audio play failed")); // NUOVO
-        }
-        
+        clickSeatFeedbackText.textContent = feedback;
         updateGameHeader();
+        
         currentQuestionIndex++;
-        nextQuestionTimeout = setTimeout(displayNextClickSeatQuestion, 2500);
+        // Lasciamo 3.5 secondi per leggere il feedback dei punti
+        nextQuestionTimeout = setTimeout(displayNextClickSeatQuestion, 3500); 
     }
+    // FINE AGGIUNTA
     
     function quitClickSeatGame() {
          if (nextQuestionTimeout) clearTimeout(nextQuestionTimeout);
@@ -818,7 +848,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const seatNumber = data.seat;
                 console.log('Click ricevuto dal seggio:', seatNumber);
                 
-                // MODIFICA IMPORTANTE: Confronto robusto (converte entrambi in stringa)
                 const deputy = allDeputies.find(d => String(d.seat) === String(seatNumber));
                 
                 if (deputy) {
@@ -826,8 +855,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     showDeputyDetails(deputy);
                 } else {
                     console.log('Nessun deputato trovato per il seggio', seatNumber);
-                    // Opzionale: Mostra un alert se il seggio è vacante
-                    // alert('Seggio Vacante');
                 }
             }
         }
@@ -849,7 +876,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nomeFilter = searchNomeInput.value.toLowerCase().trim();
         const gruppoFilter = searchGruppoSelect.value;
         const committeeFilter = searchCommitteeSelect.value;
-        const showCessati = searchShowCessati.checked; // NUOVO
+        const showCessati = searchShowCessati.checked; 
         
         searchResultsContainer.innerHTML = ''; 
         
@@ -862,9 +889,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const matchNome = nome.startsWith(nomeFilter);
             const matchGruppo = (gruppoFilter === 'Tutti') || (deputy.simple_group === gruppoFilter);
             const matchCommittee = (committeeFilter === 'Tutte') || (deputy.committees.includes(committeeFilter));
-            const matchStatus = showCessati || deputy.status !== 'cessato'; // NUOVO
+            const matchStatus = showCessati || deputy.status !== 'cessato'; 
             
-            return matchCognome && matchNome && matchGruppo && matchCommittee && matchStatus; // MODIFICATO
+            return matchCognome && matchNome && matchGruppo && matchCommittee && matchStatus; 
         });
         
         if (filteredDeputies.length === 0) {
@@ -876,7 +903,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = document.createElement('div');
             item.className = 'search-result-item';
             
-            // --- MODIFICA: Aggiungi tag (Cessato) ---
             const statusTag = deputy.status === 'cessato' ? ' <span class="status-tag">(Cessato)</span>' : '';
             
             item.innerHTML = `
@@ -894,9 +920,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function showDeputyDetails(deputy) {
         modalImage.src = deputy.photo_url;
         
-        // --- MODIFICA: Aggiungi tag (Cessato) al nome nella modale ---
         const statusTag = deputy.status === 'cessato' ? ' <span class="status-tag">(Cessato)</span>' : '';
-        modalName.innerHTML = `${deputy.name}${statusTag}`; // Usa innerHTML
+        modalName.innerHTML = `${deputy.name}${statusTag}`; 
         
         modalGroup.textContent = deputy.group;
         
@@ -908,7 +933,6 @@ document.addEventListener('DOMContentLoaded', () => {
             modalSeat.textContent = `Seggio n. ${deputy.seat}`;
             modalSeat.classList.remove('hidden');
             
-            // NUOVO CODICE: Usa emiciclo_universale in modalità embed
             const currentTheme = html.getAttribute('data-theme') || 'light';
             modalEmiciclo.src = `/emiciclo?mode=embed&highlight=${deputy.seat}&theme=${currentTheme}`;
             modalEmiciclo.classList.remove('hidden');
@@ -941,10 +965,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
    function showEmicicloMap() {
         const currentTheme = html.getAttribute('data-theme') || 'light';
-        // NUOVO CODICE: Usa emiciclo_universale in modalità default
         emicicloViewIframe.src = `/emiciclo?mode=default&theme=${currentTheme}`;
         
-        // Nascondi la vecchia legenda HTML statica, perché la nuova mappa ha la sua
         const oldLegend = document.getElementById('emiciclo-view-legend');
         if(oldLegend) oldLegend.style.display = 'none';
         
@@ -960,14 +982,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 200); 
     }
     
-    
     function endSession() {
         gameScreen.classList.add('hidden');
         manualGameScreen.classList.add('hidden'); 
         seatGameScreen.classList.add('hidden'); 
         clickSeatGameScreen.classList.add('hidden');
         endScreen.classList.remove('hidden');
-        finalScoreText.textContent = `${score} / ${totalRounds}`;
+        
+        if (currentGameMode === 'click-seat') {
+            finalScoreText.textContent = `Punteggio Finale: ${score} Punti`;
+        } else {
+            finalScoreText.textContent = `${score} / ${totalRounds}`;
+        }
         
         renderEndGameSummary();
     }
@@ -988,11 +1014,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const iconClass = result.correct ? 'correct' : 'incorrect';
             const icon = result.correct ? '✓' : '✗';
+            
+            const pointsTag = (result.points !== undefined && currentGameMode === 'click-seat') 
+                ? ` <span style="font-size: 0.85em; color: var(--text-secondary);">(${result.points} pt)</span>` 
+                : '';
 
             item.innerHTML = `
                 <img src="${result.deputy.photo_url}" class="result-summary-thumb" alt="${result.deputy.name}">
                 <div class="result-summary-info">
-                    <div class="name">${formattedName}</div>
+                    <div class="name">${formattedName}${pointsTag}</div>
                     <div class="group">${result.deputy.group}</div>
                 </div>
                 <div class="result-summary-icon ${iconClass}">${icon}</div>
@@ -1013,7 +1043,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressText = document.getElementById('progress-text');
     const container = document.getElementById('progress-container');
 
-    // Controllo preventivo: i dati sono caricati?
     if (!allDeputies || allDeputies.length === 0) {
         alert("Attendi il caricamento dei dati dei deputati prima di scaricare.");
         return;
@@ -1024,10 +1053,6 @@ document.addEventListener('DOMContentLoaded', () => {
     container.style.display = 'block';
 
     try {
-        // FILTRAGGIO INTELLIGENTE:
-        // Scarichiamo solo i deputati in carica o tutti?
-        // Per sicurezza scarichiamo TUTTI quelli presenti nel JSON (anche cessati se presenti),
-        // perché l'utente potrebbe volerli cercare nello storico.
         const targets = allDeputies.filter(d => d.photo_url);
 
         console.log(`Trovati ${targets.length} deputati con foto. Inizio caching...`);
@@ -1036,20 +1061,16 @@ document.addEventListener('DOMContentLoaded', () => {
         let count = 0;
         let successCount = 0;
 
-        // Funzione per scaricare una singola immagine
         const fetchImage = async (deputy) => {
             const url = deputy.photo_url;
             
             try {
-                // Fetch con 'no-cors' per gestire immagini esterne (opache)
-                // Il Service Worker intercetterà questa richiesta e la salverà.
                 await fetch(url, { mode: 'no-cors' });
                 successCount++;
             } catch (e) {
                 console.warn(`Errore download foto per ${deputy.name}:`, e);
             } finally {
                 count++;
-                // Aggiornamento UI ogni 5 download per non bloccare il thread principale troppo spesso
                 if (count % 5 === 0 || count === total) {
                     const percent = Math.round((count / total) * 100);
                     progressBar.value = percent;
@@ -1058,8 +1079,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // SCARICA A BLOCCHI (Concurrency control)
-        // Scaricare 400 foto contemporaneamente blocca il browser. Facciamone 5 alla volta.
         const batchSize = 5;
         for (let i = 0; i < total; i += batchSize) {
             const batch = targets.slice(i, i + batchSize);
@@ -1074,7 +1093,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerText = "❌ Errore";
         alert("Si è verificato un errore durante il download.");
     } finally {
-        // Riabilita dopo 2 secondi
         setTimeout(() => {
             btn.disabled = false;
             btn.innerText = "📥 Scarica foto per Offline";
@@ -1097,6 +1115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateGameHeader() {
         const progress = `Domanda ${currentQuestionIndex + 1} / ${totalRounds}`;
         const scoreTextContent = `Punteggio: ${score}`;
+        
         if (currentGameMode === 'classic') {
             progressText.textContent = progress;
             scoreText.textContent = scoreTextContent;
@@ -1108,7 +1127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             seatScoreText.textContent = scoreTextContent;
         } else if (currentGameMode === 'click-seat') {
             clickSeatProgressText.textContent = progress;
-            clickSeatScoreText.textContent = scoreTextContent;
+            clickSeatScoreText.textContent = `${scoreTextContent} pt`;
         }
     }
 
@@ -1157,7 +1176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchNomeInput.addEventListener('input', renderSearchResults);
     searchGruppoSelect.addEventListener('change', renderSearchResults);
     searchCommitteeSelect.addEventListener('change', renderSearchResults);
-    searchShowCessati.addEventListener('input', renderSearchResults); // NUOVO
+    searchShowCessati.addEventListener('input', renderSearchResults); 
     
     modalCloseBtn.addEventListener('click', hideModal);
     modalOverlay.addEventListener('click', (event) => {
