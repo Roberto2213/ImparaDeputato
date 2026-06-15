@@ -3,12 +3,20 @@ import re
 import requests
 import time
 import os
+import cloudscraper
 
 # --- CONFIGURAZIONE ---
 LEGISLATURA = 19
 SPARQL_ENDPOINT = "https://dati.camera.it/sparql"
 OUTPUT_FILE = 'data_cache.json'
 URL_EMICICLO_CAMERA = "https://www.camera.it/deputati/"
+
+# Inizializziamo il cloudscraper simulando un browser desktop reale
+scraper = cloudscraper.create_scraper(browser={
+    'browser': 'chrome',
+    'platform': 'windows',
+    'desktop': True
+})
 
 # --- FUNZIONI DI UTILITÀ ---
 
@@ -73,8 +81,8 @@ def load_seat_map():
     print(f"📡 Scaricamento mappa seggi in tempo reale da {URL_EMICICLO_CAMERA}...")
     
     try:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
-        response = requests.get(URL_EMICICLO_CAMERA, headers=headers, timeout=15)
+        # Usiamo scraper.get invece di requests.get
+        response = scraper.get(URL_EMICICLO_CAMERA, timeout=15)
         response.raise_for_status()
         
         # Cerchiamo la variabile JS 'var deputati = [...];' nel codice della pagina
@@ -84,7 +92,6 @@ def load_seat_map():
             deputati_data = json.loads(deputati_json_str)
             
             for dep in deputati_data:
-                # Estraiamo l'ID numerico ufficiale del deputato e il suo posto
                 dep_id = str(dep.get("idAulDeputato", ""))
                 posto = str(dep.get("posto", ""))
                 
@@ -150,14 +157,14 @@ def fetch_deputies_live(legislatura, max_retries=3, delay_seconds=5):
     """
 
     headers = {
-        "Accept": "application/sparql-results+json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "Accept": "application/sparql-results+json"
     }
     
     for attempt in range(max_retries):
         try:
             print(f"⏳ Esecuzione query SPARQL (Tentativo {attempt + 1}/{max_retries}). Attendere prego...")
-            response = requests.get(SPARQL_ENDPOINT, params={"query": query}, headers=headers, timeout=120)
+            # Usiamo scraper.get per bypassare i controlli WAF
+            response = scraper.get(SPARQL_ENDPOINT, params={"query": query}, headers=headers, timeout=120)
             response.raise_for_status() 
             
             dati = response.json()
@@ -165,7 +172,7 @@ def fetch_deputies_live(legislatura, max_retries=3, delay_seconds=5):
             return dati
             
         except requests.exceptions.JSONDecodeError:
-            print("⚠️ Errore di rete: Impossibile decodificare il JSON.")
+            print("⚠️ Errore di rete: Impossibile decodificare il JSON. Rilevato possibile blocco Anti-Bot.")
             print(f"Contenuto restituito dal server: {response.text[:250]}...")
             if attempt < max_retries - 1:
                 print(f"Riprovo tra {delay_seconds} secondi...")
@@ -187,7 +194,7 @@ def fetch_deputies_live(legislatura, max_retries=3, delay_seconds=5):
                 print(f"Riprovo tra {delay_seconds} secondi...")
                 time.sleep(delay_seconds)
 
-    raise Exception("\n❌ Impossibile scaricare i dati. I server di dati.camera.it potrebbero essere offline o sovraccarichi.")
+    raise Exception("\n❌ Impossibile scaricare i dati. I server di dati.camera.it potrebbero essere offline, sovraccarichi o bloccare costantemente il nostro IP.")
 
 # --- FUNZIONE PRINCIPALE DI COSTRUZIONE CACHE ---
 
@@ -221,7 +228,6 @@ def build_cache():
         uri = row.get("d", {}).get("value", "")
         if not uri: continue
         
-        # Estraiamo l'ID numerico dall'URI SPARQL (es: da .../d308825 estrae 308825)
         match_id = re.search(r'd(\d+)', uri)
         dep_id = match_id.group(1) if match_id else None
         
@@ -229,13 +235,11 @@ def build_cache():
         nome = row.get("nome", {}).get("value", "").title()
         full_name = f"{cognome} {nome}"
         
-        # Usiamo l'ID Deputato come chiave primaria del dizionario per raggruppare i record
         dict_key = dep_id if dep_id else full_name
         
         if dict_key not in deputies_dict:
             gruppo_raw = row.get("nomeGruppo", {}).get("value", "Misto")
             
-            # Recuperiamo il posto esatto usando l'ID
             assigned_seat = seat_map.get(dep_id, "N/D") if dep_id else "N/D"
             
             deputies_dict[dict_key] = {
@@ -250,25 +254,20 @@ def build_cache():
                 "seat": assigned_seat
             }
             
-        # Aggiungiamo le commissioni
         commissione = row.get("commissione", {}).get("value")
         if commissione:
             clean_comm = commissione.strip()
             deputies_dict[dict_key]["committees"].add(clean_comm)
             all_committees.add(clean_comm)
 
-    # Convertiamo il dizionario in lista ordinata per il JSON finale
     final_deputies = []
     for info in deputies_dict.values():
         info["committees"] = sorted(list(info["committees"]))
         final_deputies.append(info)
     
-    # Ordine alfabetico per nome
     final_deputies.sort(key=lambda x: x['name'])
-
     committee_filter_list = get_sorted_committees(all_committees)
 
-    # Salvataggio del JSON finale
     cache_data = {
         "deputies": final_deputies,
         "committees": committee_filter_list
