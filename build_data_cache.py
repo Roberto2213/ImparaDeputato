@@ -73,7 +73,7 @@ def load_seat_map():
     print(f"📡 Scaricamento mappa seggi in tempo reale da {URL_EMICICLO_CAMERA}...")
     
     try:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"}
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
         response = requests.get(URL_EMICICLO_CAMERA, headers=headers, timeout=15)
         response.raise_for_status()
         
@@ -149,16 +149,28 @@ def fetch_deputies_live(legislatura, max_retries=3, delay_seconds=5):
     }}
     """
 
-    headers = {"Accept": "application/sparql-results+json"}
+    headers = {
+        "Accept": "application/sparql-results+json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
     
     for attempt in range(max_retries):
         try:
             print(f"⏳ Esecuzione query SPARQL (Tentativo {attempt + 1}/{max_retries}). Attendere prego...")
             response = requests.get(SPARQL_ENDPOINT, params={"query": query}, headers=headers, timeout=120)
             response.raise_for_status() 
-            print("✅ Dati scaricati con successo!")
-            return response.json()
             
+            dati = response.json()
+            print("✅ Dati scaricati con successo!")
+            return dati
+            
+        except requests.exceptions.JSONDecodeError:
+            print("⚠️ Errore di rete: Impossibile decodificare il JSON.")
+            print(f"Contenuto restituito dal server: {response.text[:250]}...")
+            if attempt < max_retries - 1:
+                print(f"Riprovo tra {delay_seconds} secondi...")
+                time.sleep(delay_seconds)
+                
         except requests.exceptions.HTTPError as e:
             status_code = e.response.status_code
             if status_code in [500, 502, 503, 504]:
