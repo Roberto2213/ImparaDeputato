@@ -1,6 +1,12 @@
 import json
 import os
-from flask import Flask, render_template, jsonify, send_from_directory, make_response
+import logging
+from flask import Flask, render_template, jsonify, send_from_directory, make_response, request
+from werkzeug.utils import secure_filename
+
+# Configurazione logging per produzione
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Determina il percorso assoluto della cartella dove si trova lo script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -14,10 +20,11 @@ DEPUTIES_DATA = []
 COMMITTEE_FILTER_LIST = []
 
 def load_data_from_cache():
+    """Carica i dati in memoria. Viene chiamata all'avvio e dopo un upload manuale."""
     global DEPUTIES_DATA, COMMITTEE_FILTER_LIST
     
     if not os.path.exists(CACHE_FILE):
-        print(f"ATTENZIONE: File '{CACHE_FILE}' non trovato!")
+        logger.warning(f"ATTENZIONE: File '{CACHE_FILE}' non trovato!")
         return
 
     try:
@@ -25,16 +32,51 @@ def load_data_from_cache():
             data = json.load(f)
             DEPUTIES_DATA = data.get('deputies', [])
             COMMITTEE_FILTER_LIST = data.get('committees', [])
-        print(f"Dati caricati: {len(DEPUTIES_DATA)} deputati.")
+        logger.info(f"Dati caricati: {len(DEPUTIES_DATA)} deputati.")
+    except json.JSONDecodeError:
+        logger.error(f"Formato non valido o corrotto in '{CACHE_FILE}' (JSONDecodeError).")
     except Exception as e:
-        print(f"Errore caricamento cache: {e}")
+        logger.error(f"Errore I/O durante il caricamento cache: {e}")
 
 def get_all_groups(deputies_list):
     if not deputies_list: return []
     groups = set(d['simple_group'] for d in deputies_list if d['simple_group'])
     return sorted(list(groups))
 
+# Caricamento iniziale
 load_data_from_cache()
+
+# ==========================================
+# ENDPOINT FALLBACK: UPLOAD MANUALE UTENTE
+# ==========================================
+def allowed_file(filename: str) -> bool:
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'json'
+
+@app.route('/api/admin/upload-dataset', methods=['POST'])
+def upload_dataset():
+    """Permette l'upload manuale del file JSON bypassando GitHub e lo scraping."""
+    if 'file' not in request.files:
+        return jsonify({"error": "Nessun file fornito"}), 400
+        
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "Nome file vuoto"}), 400
+        
+    if file and allowed_file(file.filename):
+        try:
+            # Sicurezza: rimuove path traversal
+            filename = secure_filename(file.filename)
+            file.save(CACHE_FILE)
+            
+            # Hot-reload in memoria: aggiorna i dati senza riavviare l'app
+            load_data_from_cache()
+            return jsonify({"message": "Dataset aggiornato e caricato in memoria con successo."}), 200
+        except Exception as e:
+            logger.exception("Errore di sistema durante l'upload del file.")
+            return jsonify({"error": "Errore interno del server sul salvataggio."}), 500
+    
+    return jsonify({"error": "Formato file non valido. Atteso: .json"}), 400
+# ==========================================
 
 @app.route('/')
 def index():
@@ -78,7 +120,7 @@ if __name__ == '__main__':
     debug_mode = os.environ.get("FLASK_DEBUG", "True") == "True"
     
     if not DEPUTIES_DATA:
-        print(f"WARN: Cache vuota. Esegui 'python build_data_cache.py' nella cartella {BASE_DIR}")
+        logger.warning(f"Cache vuota all'avvio. Eseguire l'upload o 'python build_data_cache.py' in {BASE_DIR}")
 
-    print(f"Server avviato su http://127.0.0.1:{port}")
+    logger.info(f"Server in avvio su http://0.0.0.0:{port}")
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
