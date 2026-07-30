@@ -1,287 +1,167 @@
 import json
 import re
-import requests
-import time
-import os
-import cloudscraper
+import logging
+from bs4 import BeautifulSoup
 
-# --- CONFIGURAZIONE ---
-LEGISLATURA = 19
-SPARQL_ENDPOINT = "https://dati.camera.it/sparql"
-OUTPUT_FILE = 'data_cache.json'
-URL_EMICICLO_CAMERA = "https://www.camera.it/deputati/"
-
-# Inizializziamo il cloudscraper simulando un browser desktop reale
-scraper = cloudscraper.create_scraper(browser={
-    'browser': 'chrome',
-    'platform': 'windows',
-    'desktop': True
-})
-
-# --- FUNZIONI DI UTILITÀ ---
-
-def build_new_photo_url(uri, legislatura):
-    """Costruisce l'URL della foto partendo dall'URI del deputato"""
-    match = re.search(r'(d\d+)', uri)
-    if match:
-        dep_id = match.group(1)
-        return f"https://documenti.camera.it/_dati/leg{legislatura}/schededeputatinuovosito/fotoDefinitivo/big/{dep_id}.jpg"
-    return None
-
-def normalize_group_name(group_name):
-    """Normalizza i nomi dei gruppi per la visualizzazione"""
-    if not group_name:
-        return "N/D"
-    normalization_map = [
-        ("FRATELLI D'ITALIA", "Fratelli d'Italia"),
-        ("PARTITO DEMOCRATICO", "Partito Democratico"),
-        ("LEGA", "Lega - Salvini Premier"),
-        ("MOVIMENTO 5 STELLE", "Movimento 5 Stelle"),
-        ("FORZA ITALIA", "Forza Italia"),
-        ("AZIONE", "Azione - Italia Viva"),
-        ("ITALIA VIVA", "Azione - Italia Viva"),
-        ("VERDI E SINISTRA", "Alleanza Verdi e Sinistra"),
-        ("NOI MODERATI", "Noi Moderati"),
-        ("MISTO", "Gruppo Misto")
-    ]
-    upper_group = group_name.upper()
-    for key, canonical_name in normalization_map:
-        if key in upper_group:
-            return canonical_name
-    simplified = re.split(r' - |–|—|\(Cessato', group_name)[0].strip()
-    return simplified
-
-def get_sorted_committees(all_committee_names):
-    """Ordina le commissioni categorizzandole correttamente"""
-    roman_numeral_pattern = re.compile(r'^[IVXLC]+\s+COMMISSIONE')
-    p1_roman, p2_bicameral, p3_giunte, p4_inchiesta, p5_others = [], [], [], [], []
-
-    for name in all_committee_names:
-        if not name: continue
-        clean_name = name.strip()
-        upper_name = clean_name.upper()
-
-        if roman_numeral_pattern.match(upper_name):
-            p1_roman.append(clean_name)
-        elif upper_name.startswith("COMMISSIONE BICAMERALE"):
-            p2_bicameral.append(clean_name)
-        elif upper_name.startswith("GIUNTA"):
-            p3_giunte.append(clean_name)
-        elif upper_name.startswith("COMMISSIONE D'INCHIESTA"):
-            p4_inchiesta.append(clean_name)
-        else:
-            p5_others.append(clean_name)
-            
-    return (sorted(p1_roman) + sorted(p2_bicameral) + 
-            sorted(p3_giunte) + sorted(p4_inchiesta) + sorted(p5_others))
-
-def load_seat_map():
-    """Scarica la mappa dei seggi dinamicamente dal sito della Camera e la indicizza per ID"""
-    seat_map = {}
-    print(f"📡 Scaricamento mappa seggi in tempo reale da {URL_EMICICLO_CAMERA}...")
-    
-    try:
-        # Usiamo scraper.get invece di requests.get
-        response = scraper.get(URL_EMICICLO_CAMERA, timeout=15)
-        response.raise_for_status()
-        
-        # Cerchiamo la variabile JS 'var deputati = [...];' nel codice della pagina
-        match = re.search(r'var\s+deputati\s*=\s*(\[.*?\]);', response.text, re.DOTALL)
-        if match:
-            deputati_json_str = match.group(1)
-            deputati_data = json.loads(deputati_json_str)
-            
-            for dep in deputati_data:
-                dep_id = str(dep.get("idAulDeputato", ""))
-                posto = str(dep.get("posto", ""))
-                
-                if dep_id and posto and posto != "None":
-                    seat_map[dep_id] = posto
-        else:
-            print("⚠️ Variabile 'var deputati' non trovata nella pagina della Camera.")
-            
-    except Exception as e:
-        print(f"⚠️ Errore durante il recupero dei seggi: {e}")
-        
-    return seat_map
-
-# --- RECUPERO DATI LIVE DA DATI.CAMERA.IT ---
-
-def fetch_deputies_live(legislatura, max_retries=3, delay_seconds=5):
-    """Interroga direttamente il server SPARQL della Camera per i dati più aggiornati"""
-    print(f"\n📡 Connessione ai server della Camera per la legislatura {legislatura}...")
-    
-    query = f"""
-    PREFIX ocd: <http://dati.camera.it/ocd/>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX dc: <http://purl.org/dc/elements/1.1/>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-    SELECT DISTINCT ?d ?persona ?cognome ?nome ?dataNascita ?nato ?luogoNascita ?genere ?collegio ?nomeGruppo ?sigla ?commissione ?aggiornamento  
-    WHERE {{
-        ?persona ocd:rif_mandatoCamera ?mandato; a foaf:Person.
-        ## deputato
-        ?d a ocd:deputato; ocd:aderisce ?aderisce;
-        ocd:rif_leg <http://dati.camera.it/ocd/legislatura.rdf/repubblica_{legislatura}>;
-        ocd:rif_mandatoCamera ?mandato.
-        ## anagrafica
-        ?d foaf:surname ?cognome; foaf:gender ?genere; foaf:firstName ?nome.
-        OPTIONAL {{
-            ?persona <http://purl.org/vocab/bio/0.1/Birth> ?nascita.
-            ?nascita <http://purl.org/vocab/bio/0.1/date> ?dataNascita; 
-            rdfs:label ?nato; ocd:rif_luogo ?luogoNascitaUri. 
-            ?luogoNascitaUri dc:title ?luogoNascita. 
-        }}
-        ## aggiornamento del sistema
-        OPTIONAL {{?d <http://lod.xdams.org/ontologies/ods/modified> ?aggiornamento.}}
-        ## mandato (ESCLUDE I CESSATI tramite il MINUS endDate)
-        ?mandato ocd:rif_elezione ?elezione.  
-        MINUS {{?mandato ocd:endDate ?fineMandato.}}
-        ## elezione
-        ?elezione dc:coverage ?collegio.
-        ## adesione a gruppo
-        OPTIONAL {{
-            ?aderisce ocd:rif_gruppoParlamentare ?gruppo.
-            ?gruppo <http://purl.org/dc/terms/alternative> ?sigla.
-            ?gruppo dc:title ?nomeGruppo.
-        }}
-        MINUS {{?aderisce ocd:endDate ?fineAdesione}}
-        ## organo (commissione)
-        OPTIONAL {{
-            ?d ocd:membro ?membro.
-            ?membro ocd:rif_organo ?organo. 
-            ?organo dc:title ?commissione .
-        }}
-        MINUS {{?membro ocd:endDate ?fineMembership}}
-    }}
+def process_open_data(filepath: str) -> list:
     """
+    Parsa il JSON estratto dalla query estesa della Camera.
+    Poiché la query non usa GROUP_CONCAT, restituisce più righe per deputato 
+    (una per ogni commissione). Questa funzione fonde le righe (Deduplicazione).
+    """
+    with open(filepath, 'r', encoding='utf-8') as f:
+        data = json.load(f)
 
-    headers = {
-        "Accept": "application/sparql-results+json"
-    }
-    
-    for attempt in range(max_retries):
-        try:
-            print(f"⏳ Esecuzione query SPARQL (Tentativo {attempt + 1}/{max_retries}). Attendere prego...")
-            # Usiamo scraper.get per bypassare i controlli WAF
-            response = scraper.get(SPARQL_ENDPOINT, params={"query": query}, headers=headers, timeout=120)
-            response.raise_for_status() 
+    bindings = data.get('results', {}).get('bindings', [])
+    deputati_dict = {}
+
+    for item in bindings:
+        def get_val(key): return item.get(key, {}).get('value', '').strip()
+
+        # Estrazione dell'URI per ricavare l'ID pulito e la foto HD
+        persona_uri = get_val('persona')
+        if not persona_uri:
+            continue
             
-            dati = response.json()
-            print("✅ Dati scaricati con successo!")
-            return dati
+        id_match = re.search(r'p(\d+)', persona_uri)
+        id_numeric = id_match.group(1) if id_match else ""
+        
+        # Formattazione anagrafica per compatibilità col frontend: "Cognome Nome"
+        nome = get_val('nome').title()
+        cognome = get_val('cognome').title()
+        full_name = f"{cognome} {nome}".strip()
+        
+        commissione = get_val('commissione')
+        
+        # Se il deputato non è ancora nel dizionario, lo creiamo
+        if full_name not in deputati_dict:
+            genere_raw = get_val('genere').lower()
+            gender_mapped = "male" if genere_raw.startswith("m") else "female"
             
-        except requests.exceptions.JSONDecodeError:
-            print("⚠️ Errore di rete: Impossibile decodificare il JSON. Rilevato possibile blocco Anti-Bot.")
-            print(f"Contenuto restituito dal server: {response.text[:250]}...")
-            if attempt < max_retries - 1:
-                print(f"Riprovo tra {delay_seconds} secondi...")
-                time.sleep(delay_seconds)
+            gruppo = get_val('nomeGruppo')
+            collegio = get_val('collegio')
+            
+            # Generazione URL Foto in Alta Definizione
+            foto_url = f"https://documenti.camera.it/_dati/leg19/schededeputatinuovosito/fotoDefinitivo/big/d{id_numeric}.jpg" if id_numeric else ""
+            
+            deputati_dict[full_name] = {
+                "name": full_name,
+                "photo_url": foto_url,
+                "group": gruppo,
+                "simple_group": _parse_simple_group(gruppo),
+                "status": "in_carica",
+                "gender": gender_mapped,
+                "constituency": collegio or "N/D",
+                "committees": set(),
                 
-        except requests.exceptions.HTTPError as e:
-            status_code = e.response.status_code
-            if status_code in [500, 502, 503, 504]:
-                print(f"⚠️ I server della Camera hanno risposto con errore {status_code}.")
-                if attempt < max_retries - 1:
-                    print(f"Riprovo tra {delay_seconds} secondi...")
-                    time.sleep(delay_seconds)
-            else:
-                raise Exception(f"Errore fatale nella query: HTTP {status_code}")
+                # Campi ridondanti per garantire compatibilità con le tue logiche legacy
+                "nome": nome,
+                "cognome": cognome,
+                "foto": foto_url,
+                "image_url": foto_url,
+                "gruppo": gruppo,
+                "commissioni": set(),
                 
-        except requests.exceptions.RequestException as e:
-            print(f"⚠️ Errore di rete: {e}")
-            if attempt < max_retries - 1:
-                print(f"Riprovo tra {delay_seconds} secondi...")
-                time.sleep(delay_seconds)
+                # FIX: Sincronizziamo 'genere' al valore raw 'male'/'female' per impedire 
+                # che la logica di fallback in app.py corrompa la chiave 'gender' attesa dal frontend.
+                "genere": gender_mapped 
+            }
+        
+        # Aggiungiamo la commissione al Set (evita duplicati)
+        if commissione:
+            deputati_dict[full_name]["committees"].add(commissione)
+            deputati_dict[full_name]["commissioni"].add(commissione)
 
-    raise Exception("\n❌ Impossibile scaricare i dati. I server di dati.camera.it potrebbero essere offline, sovraccarichi o bloccare costantemente il nostro IP.")
+    # Convertiamo il dizionario in lista e i Set in Liste ordinate per JSON
+    deputati_list = list(deputati_dict.values())
+    for dep in deputati_list:
+        dep["committees"] = sorted(list(dep["committees"]))
+        dep["commissioni"] = sorted(list(dep["commissioni"]))
+        
+    return deputati_list
 
-# --- FUNZIONE PRINCIPALE DI COSTRUZIONE CACHE ---
+def _parse_simple_group(gruppo: str) -> str:
+    """Mappa i nomi completi sulle Select Option esatte del frontend JS."""
+    g_up = gruppo.upper()
+    if "5 STELLE" in g_up: return "Movimento 5 Stelle"
+    if "FRATELLI D'ITALIA" in g_up: return "Fratelli d'Italia"
+    if "DEMOCRATICO" in g_up: return "Partito Democratico"
+    if "LEGA" in g_up: return "Lega - Salvini Premier"
+    if "FORZA ITALIA" in g_up: return "Forza Italia"
+    if "AZIONE" in g_up or "ITALIA VIVA" in g_up or "RENEW" in g_up: return "Azione - Italia Viva"
+    if "VERDI" in g_up and "SINISTRA" in g_up: return "Alleanza Verdi e Sinistra"
+    if "MODERATI" in g_up: return "Noi Moderati"
+    return "Gruppo Misto"
 
-def build_cache():
-    print("="*50)
-    print("🚀 AVVIO AGGIORNAMENTO DATI IMPARA DEPUTATO")
-    print("="*50)
+def process_emiciclo(filepath: str) -> dict:
+    """
+    Ricava l'allocazione seggio <-> deputato dall'HTML dell'Emiciclo.
+    Adattato al DOM ufficiale di camera.it/deputati
+    """
+    seats = {}
+    with open(filepath, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    # Fallback legacy per vecchi JSON
+    if filepath.endswith('.json'):
+        data = json.loads(content)
+        for seat in data:
+            match = re.match(r'^(\d+)\s*-\s*(.+?)\s+([A-Z0-9\-\+]+)$', seat.get('title', ''))
+            if match:
+                seats[match.group(2).strip().upper()] = match.group(1)
+        return seats
+
+    # Parsing dell'HTML aggiornato
+    soup = BeautifulSoup(content, 'html.parser')
     
-    # 1. SCARICA LA MAPPA DEI SEGGI (Indicizzata per ID Deputato)
-    seat_map = load_seat_map()
-    print(f"🪑 Mappa seggi generata: {len(seat_map)} postazioni trovate sul sito ufficiale.")
-    
-    # 2. SCARICA I DATI VIA SPARQL
-    try:
-        data = fetch_deputies_live(LEGISLATURA)
-    except Exception as e:
-        print(e)
-        return
+    # Cerca tutti i tag <a> che contengono l'attributo aria-label (dove sta il nome)
+    for a_tag in soup.find_all('a', attrs={"aria-label": True}):
+        aria_label = a_tag['aria-label']
+        
+        # Controlla se è un seggio occupato
+        if "Scheda del deputato" in aria_label:
+            # Estrae il nome: prende quello che c'è tra "deputato " e ", gruppo"
+            name_match = re.search(r'deputato\s+(.+?),\s+gruppo', aria_label)
+            
+            # Cerca il tag <circle> all'interno dell'<a> per prendere l'ID del seggio
+            circle_tag = a_tag.find('circle')
+            
+            if name_match and circle_tag and circle_tag.get('id'):
+                name_part = name_match.group(1).strip().upper()
+                seat_id = circle_tag.get('id')
+                seats[name_part] = seat_id
 
-    bindings = data.get("results", {}).get("bindings", [])
-    print(f"📦 Ricevuti {len(bindings)} record grezzi da elaborare (incluse doppie commissioni).")
-    
-    if len(bindings) == 0:
-        print("⚠️  Nessun dato restituito! Verifica se il server Camera ha modificato le ontologie.")
-        return
+    return seats
 
-    deputies_dict = {}
+def build_final_cache(deputati_data: list, emiciclo_layout: dict, output_cache_path: str) -> None:
+    """Fonde i dati anagrafici con le posizioni dell'emiciclo."""
     all_committees = set()
 
-    for row in bindings:
-        uri = row.get("d", {}).get("value", "")
-        if not uri: continue
+    for dep in deputati_data:
+        nome_up = dep['nome'].upper()
+        cognome_up = dep['cognome'].upper()
         
-        match_id = re.search(r'd(\d+)', uri)
-        dep_id = match_id.group(1) if match_id else None
+        # Matching robusto "Cognome Nome" o "Nome Cognome"
+        target_1 = f"{cognome_up} {nome_up}"
+        target_2 = f"{nome_up} {cognome_up}"
         
-        cognome = row.get("cognome", {}).get("value", "").title()
-        nome = row.get("nome", {}).get("value", "").title()
-        full_name = f"{cognome} {nome}"
+        matched_seat = "N/D"
+        for seat_name, seat_id in emiciclo_layout.items():
+            if target_1 in seat_name or target_2 in seat_name:
+                matched_seat = seat_id
+                break
+                
+        dep['seat'] = matched_seat
         
-        dict_key = dep_id if dep_id else full_name
-        
-        if dict_key not in deputies_dict:
-            gruppo_raw = row.get("nomeGruppo", {}).get("value", "Misto")
-            
-            assigned_seat = seat_map.get(dep_id, "N/D") if dep_id else "N/D"
-            
-            deputies_dict[dict_key] = {
-                "name": full_name,
-                "photo_url": build_new_photo_url(uri, LEGISLATURA),
-                "group": gruppo_raw,
-                "simple_group": normalize_group_name(gruppo_raw),
-                "status": "in_carica",
-                "gender": row.get("genere", {}).get("value", "N/D"),
-                "constituency": row.get("collegio", {}).get("value", "N/D"),
-                "committees": set(),
-                "seat": assigned_seat
-            }
-            
-        commissione = row.get("commissione", {}).get("value")
-        if commissione:
-            clean_comm = commissione.strip()
-            deputies_dict[dict_key]["committees"].add(clean_comm)
-            all_committees.add(clean_comm)
+        for c in dep['committees']:
+            all_committees.add(c)
 
-    final_deputies = []
-    for info in deputies_dict.values():
-        info["committees"] = sorted(list(info["committees"]))
-        final_deputies.append(info)
-    
-    final_deputies.sort(key=lambda x: x['name'])
-    committee_filter_list = get_sorted_committees(all_committees)
-
-    cache_data = {
-        "deputies": final_deputies,
-        "committees": committee_filter_list
+    final_data = {
+        "deputies": deputati_data,
+        "committees": sorted(list(all_committees))
     }
-    
-    with open(OUTPUT_FILE, 'w', encoding='utf-8') as outfile:
-        json.dump(cache_data, outfile, ensure_ascii=False, indent=2)
-        
-    print("\n" + "="*50)
-    print("✅ ELABORAZIONE COMPLETATA CON SUCCESSO!")
-    print(f"📄 Salvato su: {os.path.abspath(OUTPUT_FILE)}")
-    print(f"👤 Deputati unici attualmente in carica: {len(final_deputies)}")
-    print(f"🏛️  Totale Commissioni estratte: {len(committee_filter_list)}")
-    print("="*50)
 
-if __name__ == "__main__":
-    build_cache()
+    with open(output_cache_path, 'w', encoding='utf-8') as f:
+        json.dump(final_data, f, ensure_ascii=False, indent=4)
+        
+    logging.info("Cache JSON rigenerata con successo e validata.")

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modalità Allenamento</title>
+
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#6366f1">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/training_styles.css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deputati">
+<link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+            🌙
+        </button>
+
+        <div id="setup-screen">
+            <h1>Allenamento Deputati</h1>
+            
+            <div class="form-group">
+                <label for="game-mode-select">Scegli la Modalità di Gioco</label>
+                <div class="custom-select">
+                    <select id="game-mode-select">
+                        <option value="classic">Classica (4 opzioni)</option>
+                        <option value="manual">Manuale (Inserisci cognome e gruppo)</option>
+                        <option value="seat">Difficile (Indovina Seggio - Scrivi)</option>
+                        <option value="click-seat">Super Difficile (Clicca Seggio)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="deputy-source-select">Fonte Deputati</label>
+                <div class="custom-select">
+                    <select id="deputy-source-select">
+                        <option value="all">Tutti i deputati (filtrati per gruppo)</option>
+                        <option value="manual">Seleziona manualmente</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="manual-selection-controls" class="form-group hidden">
+                <button class="btn-secondary-full" id="open-selection-modal-btn">Seleziona Deputati...</button>
+                <p id="selected-count-info" class="info-text">0 deputati selezionati</p>
+            </div>
+            
+            <div class="form-group" id="group-select-container">
+                <label for="group-select">Scegli un Gruppo Parlamentare</label>
+                <div class="custom-select">
+                    <select id="group-select"></select>
+                </div>
+            </div>
+
+            <div class="form-group" id="committee-select-container">
+                <label for="committee-select">Scegli una Commissione (Opzionale)</label>
+                <div class="custom-select">
+                    <select id="committee-select"></select>
+                </div>
+            </div>
+            <div class="form-group" id="rounds-input-container">
+                <label for="rounds-input">Numero di Deputati da Indovinare</label>
+                <input type="number" id="rounds-input" value="10" min="1" max="100">
+            </div>
+            
+            <div class="setup-actions">
+                <button class="btn-primary" id="start-btn">Inizia Allenamento</button>
+                <button class="btn-secondary-full" id="search-btn">Cerca un Deputato</button>
+            </div>
+            
+            <p id="deputy-count-info" class="info-text"></p>
+        </div>
+
+        <div id="game-screen" class="hidden">
+            <div id="game-header" class="game-header">
+                <div>
+                    <div id="progress-text">Domanda 1 / 10</div>
+                    <div id="score-text" class="score-text">Punteggio: 0</div>
+                </div>
+                <button id="quit-btn" class="btn-secondary">Esci</button>
+            </div>
+            <div id="image-container">
+                <img id="deputy-image" src="" alt="Foto del deputato">
+            </div>
+            <div id="answers-container">
+            </div>
+            <div id="feedback-text" class="feedback-text"></div>
+        </div>
+        
+        <div id="manual-game-screen" class="hidden">
+            <div id="manual-game-header" class="game-header">
+                <div>
+                    <div id="manual-progress-text">Domanda 1 / 10</div>
+                    <div id="manual-score-text" class="score-text">Punteggio: 0</div>
+                </div>
+                <button id="manual-quit-btn" class="btn-secondary">Esci</button>
+            </div>
+            
+            <div class="manual-layout-grid">
+                <div id="manual-image-container">
+                    <img id="manual-deputy-image" src="" alt="Foto del deputato">
+                </div>
+                <div class="manual-controls">
+                    <div id="manual-inputs-container">
+                         <input type="text" id="lastname-input" placeholder="Inserisci il cognome...">
+                         <div class="custom-select" id="group-guess-wrapper">
+                            <select id="group-guess-select">
+                            </select>
+                        </div>
+                    </div>
+                    <div id="hints-container">
+                        <button id="hint-group-btn" class="btn-secondary">Suggerimento: Gruppo</button>
+                        <button id="hint-initial-btn" class="btn-secondary">Suggerimento: Iniziale</button>
+                    </div>
+                    <div id="hints-display-area" class="hidden"></div>
+                    <button class="btn-primary" id="submit-manual-answer-btn">Conferma Risposta</button>
+                    <div id="manual-feedback-text" class="feedback-text"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="seat-game-screen" class="hidden">
+            <div id="seat-game-header" class="game-header">
+                <div>
+                    <div id="seat-progress-text">Domanda 1 / 10</div>
+                    <div id="seat-score-text" class="score-text">Punteggio: 0</div>
+                </div>
+                <button id="seat-quit-btn" class="btn-secondary">Esci</button>
+            </div>
+            
+            <div class="manual-layout-grid">
+                <div id="seat-image-container">
+                    <img id="seat-deputy-image" src="" alt="Foto del deputato">
+                </div>
+                <div class="seat-controls">
+                    <div id="seat-inputs-container">
+                         <input type="number" id="seat-input" placeholder="Inserisci il numero seggio..." min="1" max="661">
+                    </div>
+                    <button class="btn-primary" id="submit-seat-answer-btn" style="margin-top: 20px;">Conferma Seggio</button>
+                    <div id="seat-feedback-text" class="feedback-text"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="click-seat-game-screen" class="hidden">
+            <div id="click-seat-game-header" class="game-header">
+                <div>
+                    <div id="click-seat-progress-text">Domanda 1 / 10</div>
+                    <div id="click-seat-score-text" class="score-text">Punteggio: 0</div>
+                </div>
+                <button id="click-seat-quit-btn" class="btn-secondary">Esci</button>
+            </div>
+            
+            <h2 id="click-seat-question-text" style="text-align: center; margin-bottom: 20px; font-size: 1.8rem;"></h2>
+            
+            <iframe id="quiz-emiciclo-iframe" src="about:blank" title="Mappa Emiciclo Quiz"></iframe>
+            
+            <div id="click-seat-feedback-text" class="feedback-text"></div>
+        </div>
+
+
+        <div id="end-screen" class="hidden">
+            <h1>Sessione Terminata!</h1>
+            <p id="final-score-text">Punteggio Finale: 8 / 10</p>
+            
+            <h3>Riepilogo Sessione</h3>
+            <div id="results-summary-container">
+            </div>
+            
+            <button class="btn-primary" id="restart-btn">Allenati Ancora</button>
+        </div>
+        
+        <div id="search-screen" class="hidden">
+            <div id="search-header">
+                <h2>Cerca Deputato</h2>
+                <div>
+                    <button id="view-emiciclo-btn" class="btn-secondary" style="margin-right: 10px;">Visualizza Emiciclo</button>
+                    <button id="search-back-btn" class="btn-secondary">Indietro</button>
+                </div>
+            </div>
+            
+            <div id="search-filters">
+                <div class="form-group">
+                    <label for="search-cognome-input">Cognome</label>
+                    <input type="text" id="search-cognome-input" placeholder="Es. Rossi">
+                </div>
+                <div class="form-group">
+                    <label for="search-nome-input">Nome</label>
+                    <input type="text" id="search-nome-input" placeholder="Es. Mario">
+                </div>
+                <div class="form-group">
+                    <label for="search-gruppo-select">Gruppo</label>
+                    <div class="custom-select">
+                        <select id="search-gruppo-select"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="search-committee-select">Commissione</label>
+                    <div class="custom-select">
+                        <select id="search-committee-select"></select>
+                    </div>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1; margin-top: 10px;">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="search-show-cessati" checked>
+                        Includi deputati cessati
+                    </label>
+                </div>
+            </div>
+            
+            <div id="search-results-container">
+            </div>
+        </div>
+        
+        <div id="selection-screen" class="hidden">
+            <div id="selection-header">
+                <h2>Seleziona Deputati</h2>
+                <div id="selection-header-actions">
+                    <button id="selection-select-all-visible-btn" class="btn-secondary">Seleziona Visibili</button>
+                    <button id="selection-deselect-all-visible-btn" class="btn-secondary">Deseleziona Visibili</button>
+                    <span id="selection-counter">Selezionati: 0</span>
+                    <button id="selection-done-btn" class="btn-secondary">Conferma</button>
+                </div>
+            </div>
+            
+            <div id="selection-filters">
+                <div class="form-group">
+                    <label for="select-cognome-input">Cognome</label>
+                    <input type="text" id="select-cognome-input" placeholder="Es. Rossi">
+                </div>
+                <div class="form-group">
+                    <label for="select-nome-input">Nome</label>
+                    <input type="text" id="select-nome-input" placeholder="Es. Mario">
+                </div>
+                <div class="form-group">
+                    <label for="select-gruppo-select">Gruppo</label>
+                    <div class="custom-select">
+                        <select id="select-gruppo-select"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="select-committee-select">Commissione</label>
+                    <div class="custom-select">
+                        <select id="select-committee-select"></select>
+                    </div>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1; margin-top: 10px;">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="select-show-cessati" checked>
+                        Includi deputati cessati
+                    </label>
+                </div>
+            </div>
+            
+            <div id="selection-results-container">
+            </div>
+        </div>
+
+        <!-- INIZIO SEZIONE ADMIN: AGGIORNAMENTO DATABASE -->
+        <div id="admin-panel" class="form-group" style="margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--border-color, #e2e8f0); border-radius: 0.5rem; background-color: var(--surface-color, rgba(99, 102, 241, 0.05));">
+            <h3>Aggiornamento Database Montecitorio</h3>
+            <div class="instructions" style="font-size: 0.9rem; margin-bottom: 1rem;">
+                <h4>Istruzioni per l'estrazione e il download dei dati:</h4>
+                <ol style="padding-left: 1.5rem;">
+                    <li><strong>Anagrafica Deputati (JSON via SPARQL):</strong> Vai sull'<a href="http://dati.camera.it/sparql" target="_blank" rel="noopener noreferrer">Endpoint SPARQL della Camera</a>. Copia e incolla la seguente query, esegui la ricerca e salva il risultato in formato JSON:
+                        <div style="position: relative; margin: 10px 0;">
+                   <textarea id="sparql-query" readonly aria-label="Query SPARQL per dati Camera" style="width: 100%; height: 250px; font-family: monospace; font-size:12px; padding: 10px; resize: vertical; background: #1e1e1e; color: #d4d4d4; border: 1px solid #ccc; border-radius: 4px;">
+PREFIX ocd: <http://dati.camera.it/ocd/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?persona ?cognome ?nome ?dataNascita ?nato ?luogoNascita ?genere ?collegio ?nomeGruppo ?sigla ?commissione ?aggiornamento  
+WHERE {
+  ?persona ocd:rif_mandatoCamera ?mandato; a foaf:Person.
+  ?d a ocd:deputato; ocd:aderisce ?aderisce;
+     ocd:rif_leg <http://dati.camera.it/ocd/legislatura.rdf/repubblica_19>;
+     ocd:rif_mandatoCamera ?mandato.
+  ?d foaf:surname ?cognome; foaf:gender ?genere; foaf:firstName ?nome.
+  
+  OPTIONAL {
+    ?persona <http://purl.org/vocab/bio/0.1/Birth> ?nascita.
+    ?nascita <http://purl.org/vocab/bio/0.1/date> ?dataNascita; 
+             rdfs:label ?nato; ocd:rif_luogo ?luogoNascitaUri. 
+    ?luogoNascitaUri dc:title ?luogoNascita. 
+  }
+  OPTIONAL { ?d <http://lod.xdams.org/ontologies/ods/modified> ?aggiornamento. }
+  
+  ?mandato ocd:rif_elezione ?elezione.  
+  MINUS { ?mandato ocd:endDate ?fineMandato. }
+  ?elezione dc:coverage ?collegio.
+  
+  OPTIONAL {
+    ?aderisce ocd:rif_gruppoParlamentare ?gruppo.
+    ?gruppo <http://purl.org/dc/terms/alternative> ?sigla.
+    ?gruppo dc:title ?nomeGruppo.
+  }
+  MINUS { ?aderisce ocd:endDate ?fineAdesione }
+  
+  OPTIONAL {
+    ?d ocd:membro ?membro.
+    ?membro ocd:rif_organo ?organo. 
+    ?organo dc:title ?commissione .
+  }
+  MINUS { ?membro ocd:endDate ?fineMembership }
+}
+ORDER BY ?cognome ?nome
+</textarea>
+                    <button type="button" id="copy-sparql-btn" style="position: absolute; top: 10px; right: 25px; padding: 6px 12px; cursor: pointer; border: none; border-radius: 4px; background: #0055A5; color: white; font-weight: bold;">Copia Query</button>
+                </div>
+                    </li>
+                    <li><strong>Dati Emiciclo:</strong> Vai su <a href="https://www.camera.it/leg19/28" target="_blank" rel="noopener noreferrer">camera.it/deputati</a>. Salva la pagina o estrai il file sorgente HTML/JSON.</li>
+                    <li>Carica entrambi i file qui sotto per generare la nuova cache.</li>
+                </ol>
+            </div>
+
+            <form id="upload-data-form" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="open-data-file">1. File Open Data (JSON SPARQL):</label>
+                    <input type="file" id="open-data-file" name="open_data" accept=".json" required style="width: 100%; padding: 8px; border: 1px dashed var(--primary-color, #6366f1); border-radius: 4px; background: transparent; color: inherit;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="emiciclo-file">2. File Emiciclo (HTML/JSON):</label>
+                    <input type="file" id="emiciclo-file" name="emiciclo_data" accept=".html,.json,.svg" required style="width: 100%; padding: 8px; border: 1px dashed var(--primary-color, #6366f1); border-radius: 4px; background: transparent; color: inherit;">
+                </div>
+                <button type="submit" id="submit-upload" class="btn-primary" style="margin-top: 10px;">Genera e Scarica data_cache.json</button>
+                <div id="upload-status" style="margin-top: 5px; font-weight: bold; font-size: 0.9rem; text-align: center;"></div>
+            </form>
+        </div>
+        <!-- FINE PANNELLO ADMIN -->
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="btn-download-offline" class="btn-start" style="font-size: 16px; padding: 10px;">
+                📥 Scarica foto per Offline
+            </button>
+            
+            <button id="btn-force-update" class="btn-secondary" style="font-size: 16px; padding: 10px; margin-left: 10px;">
+                🔄 Aggiorna App
+            </button>
+            <div id="progress-container" style="display:none; margin-top: 10px;">
+                <progress id="offline-progress" value="0" max="100"></progress>
+                <span id="progress-text">0%</span>
+            </div>
+        </div>
+        
+        <footer class="site-footer">
+            <p>
+                Made with ❤️ by <a href="https://github.com/Roberto2213" target="_blank" rel="noopener noreferrer">Roberto Bastevole</a> Data from <a href="https://data.camera.it" target="_blank" rel="noopener noreferrer">data.camera.it</a>.
+            </p>
+            <p>Rilasciato sotto licenza CC-BY-SA-4.0 license.</p>
+        </footer>
+
+    </div>
+
+    <div id="modal-overlay" class="hidden">
+        <div id="modal-content"> <button id="modal-close-btn">×</button>
+            
+            <div id="modal-info-col">
+                <img id="modal-image" src="" alt="Foto deputato">
+                <h3 id="modal-name">Nome Deputato</h3>
+                <p id="modal-group">Gruppo Parlamentare</p>
+                <p id="modal-constituency" class="modal-detail-text"></p>
+                <p id="modal-gender" class="modal-detail-text"></p>
+                <p id="modal-seat" class="modal-detail-text"></p>
+                
+                <div id="modal-committees-container" class="hidden">
+                    <h4>Commissioni</h4>
+                    <div id="modal-committees">
+                    </div>
+                </div>
+            </div>
+            
+            <iframe id="modal-emiciclo" src="about:blank" title="Posizione Emiciclo" class="hidden"></iframe>
+        </div>
+    </div>
+    
+    <div id="emiciclo-view-overlay" class="hidden">
+        <button id="emiciclo-view-close-btn">×</button>
+        <div id="emiciclo-view-content">
+            <iframe id="emiciclo-view-iframe" src="about:blank" title="Mappa Emiciclo Completo"></iframe>
+            
+            <div id="emiciclo-view-legend">
+                <div class="group-label" id="label-fdi">Fratelli d'Italia</div>
+                <div class="group-label" id="label-lega">Lega</div>
+                <div class="group-label" id="label-fi">Forza Italia</div>
+                <div class="group-label" id="label-nm">Noi Moderati</div>
+                <div class="group-label" id="label-misto">Gruppo Misto</div>
+                <div class="group-label" id="label-aziv">Azione-Italia Viva</div>
+                <div class="group-label" id="label-m5s">Movimento 5 Stelle</div>
+                <div class="group-label" id="label-pd">Partito Democratico</div>
+                <div class="group-label" id="label-avs">Alleanza Verdi e Sinistra</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio-correct" src="/static/audio/correct.wav" preload="auto"></audio>
+    <audio id="audio-incorrect" src="/static/audio/incorrect.wav" preload="auto"></audio>
+    <audio id="audio-start" src="/static/audio/round_start.wav" preload="auto"></audio>
+
+    <script src="/static/training_logic.js" defer>
+    </script>
+</body>
+</html>
