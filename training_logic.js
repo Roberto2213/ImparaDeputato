@@ -136,6 +136,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalEmiciclo = document.getElementById('modal-emiciclo');
     const modalCommitteesContainer = document.getElementById('modal-committees-container');
     const modalCommittees = document.getElementById('modal-committees');
+
+    // Gestione dell'aggiornamento automatico della Cache
+const uploadForm = document.getElementById('upload-data-form');
+if (uploadForm) {
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submit-upload');
+        const statusDiv = document.getElementById('upload-status');
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Aggiornamento in corso...';
+        if (statusDiv) {
+            statusDiv.textContent = '';
+            statusDiv.style.color = '';
+        }
+
+        const formData = new FormData(uploadForm);
+
+        try {
+            const response = await fetch('/api/update_cache', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                if (statusDiv) {
+                    statusDiv.style.color = '#10b981'; // Verde successo
+                    statusDiv.textContent = 'Cache aggiornata! Ricarico l\'app...';
+                }
+                // Ricarica la pagina per caricare il nuovo data_cache.json in memoria
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                if (statusDiv) {
+                    statusDiv.style.color = '#ef4444'; // Rosso errore
+                    statusDiv.textContent = `Errore: ${result.error || 'Sconosciuto'}`;
+                }
+            }
+        } catch (error) {
+            console.error('Errore API:', error);
+            if (statusDiv) {
+                statusDiv.style.color = '#ef4444';
+                statusDiv.textContent = 'Errore di connessione al server.';
+            }
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Genera e Aggiorna Cache';
+        }
+    });
+}
     
     // Elementi Modale Emiciclo
     const viewEmicicloBtn = document.getElementById('view-emiciclo-btn');
